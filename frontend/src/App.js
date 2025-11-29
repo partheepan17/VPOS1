@@ -377,7 +377,7 @@ function App() {
     }
   };
 
-  const updateCartItem = (index, field, value) => {
+  const updateCartItem = async (index, field, value) => {
     const newCart = [...cart];
     newCart[index][field] = parseFloat(value) || 0;
     
@@ -388,10 +388,25 @@ function App() {
     
     if (field === 'discount_percent') {
       newCart[index].discount_amount = (newCart[index].subtotal * value) / 100;
+      newCart[index].total = newCart[index].subtotal - newCart[index].discount_amount;
+      setCart(newCart);
+    } else if (field === 'quantity') {
+      // Reapply discount rules when quantity changes
+      try {
+        const response = await axios.post(`${API_URL}/api/discount-rules/apply`, 
+          newCart, 
+          { params: { price_tier: selectedTier } }
+        );
+        setCart(response.data.items);
+      } catch (error) {
+        console.error('Error applying discounts:', error);
+        newCart[index].total = newCart[index].subtotal - newCart[index].discount_amount;
+        setCart(newCart);
+      }
+    } else {
+      newCart[index].total = newCart[index].subtotal - newCart[index].discount_amount;
+      setCart(newCart);
     }
-    
-    newCart[index].total = newCart[index].subtotal - newCart[index].discount_amount;
-    setCart(newCart);
   };
 
   const removeFromCart = (index) => {
