@@ -27,6 +27,10 @@ function App() {
   const [showInvoice, setShowInvoice] = useState(false);
   const [salesHistory, setSalesHistory] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [heldBills, setHeldBills] = useState([]);
+  const [showHeldBills, setShowHeldBills] = useState(false);
+  const [payments, setPayments] = useState([]);
+  const [showSplitPayment, setShowSplitPayment] = useState(false);
 
   const barcodeInputRef = useRef(null);
   const scanBuffer = useRef('');
