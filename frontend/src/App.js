@@ -320,6 +320,49 @@ function App() {
     }
   };
 
+  // Product search function - searches by name, SKU, or ID
+  const handleProductSearch = (searchValue) => {
+    setProductSearchTerm(searchValue);
+    
+    if (!searchValue || searchValue.length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    const searchLower = searchValue.toLowerCase();
+    const results = products.filter(product => {
+      // Search by product name (all languages)
+      const nameMatch = 
+        product.name_en?.toLowerCase().includes(searchLower) ||
+        product.name_si?.includes(searchValue) ||
+        product.name_ta?.includes(searchValue);
+      
+      // Search by SKU
+      const skuMatch = product.sku?.toLowerCase().includes(searchLower);
+      
+      // Search by ID
+      const idMatch = product.id?.toLowerCase().includes(searchLower);
+      
+      return nameMatch || skuMatch || idMatch;
+    });
+
+    setSearchResults(results.slice(0, 10)); // Show max 10 results
+    setShowSearchResults(results.length > 0);
+  };
+
+  // Add product from search results
+  const addProductFromSearch = (product) => {
+    addToCart(product);
+    setProductSearchTerm('');
+    setSearchResults([]);
+    setShowSearchResults(false);
+    // Focus back to barcode input
+    if (barcodeInputRef.current) {
+      barcodeInputRef.current.focus();
+    }
+  };
+
   const handleBarcodeScanned = async (barcode) => {
     try {
       const response = await axios.get(`${API_URL}/api/products/barcode/${barcode}`);
