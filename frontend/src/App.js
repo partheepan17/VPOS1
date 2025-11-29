@@ -1031,63 +1031,164 @@ function App() {
       {/* Payment Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4 fade-in">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">{getText('payment')}</h2>
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-xl w-full mx-4 max-h-[90vh] overflow-y-auto fade-in">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">{getText('payment')}</h2>
+              <button
+                onClick={() => setShowSplitPayment(!showSplitPayment)}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  showSplitPayment ? 'bg-accent-500 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                Split Payment
+              </button>
+            </div>
             
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getText('paymentMethod')}
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['cash', 'card', 'qr'].map(method => (
-                    <button
-                      key={method}
-                      onClick={() => setPaymentMethod(method)}
-                      className={`px-4 py-3 rounded-lg font-medium transition ${
-                        paymentMethod === method
-                          ? 'bg-primary-500 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                      data-testid={`payment-${method}`}
-                    >
-                      {getText(method)}
-                    </button>
-                  ))}
+            {!showSplitPayment ? (
+              /* Single Payment Mode */
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {getText('paymentMethod')}
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {['cash', 'card', 'qr'].map(method => (
+                      <button
+                        key={method}
+                        onClick={() => setPaymentMethod(method)}
+                        className={`px-4 py-3 rounded-lg font-medium transition ${
+                          paymentMethod === method
+                            ? 'bg-primary-500 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                        data-testid={`payment-${method}`}
+                      >
+                        {getText(method)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {getText('amount')}
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 text-lg"
+                    data-testid="payment-amount"
+                  />
+                </div>
+
+                <div className="bg-primary-50 rounded-lg p-4">
+                  <div className="flex justify-between text-xl font-bold text-primary-700">
+                    <span>{getText('total')}:</span>
+                    <span>LKR {total.toFixed(2)}</span>
+                  </div>
+                  {parseFloat(paymentAmount) > total && (
+                    <div className="flex justify-between text-lg text-secondary-600 mt-2">
+                      <span>Change:</span>
+                      <span>LKR {(parseFloat(paymentAmount) - total).toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getText('amount')}
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 text-lg"
-                  data-testid="payment-amount"
-                />
-              </div>
-
-              <div className="bg-primary-50 rounded-lg p-4">
-                <div className="flex justify-between text-xl font-bold text-primary-700">
-                  <span>{getText('total')}:</span>
-                  <span>LKR {total.toFixed(2)}</span>
+            ) : (
+              /* Split Payment Mode */
+              <div className="space-y-4">
+                {/* Add Payment Form */}
+                <div className="border border-gray-300 rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-800 mb-3">Add Payment</h3>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Method</label>
+                      <select
+                        value={paymentMethod}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
+                      >
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="qr">QR/Wallet</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Amount</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={paymentAmount}
+                        onChange={(e) => setPaymentAmount(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={addPayment}
+                    className="w-full px-4 py-2 bg-accent-500 hover:bg-accent-600 text-white rounded-lg font-medium transition"
+                  >
+                    + Add Payment
+                  </button>
                 </div>
-                {parseFloat(paymentAmount) > total && (
-                  <div className="flex justify-between text-lg text-secondary-600 mt-2">
-                    <span>Change:</span>
-                    <span>LKR {(parseFloat(paymentAmount) - total).toFixed(2)}</span>
+
+                {/* Payments List */}
+                {payments.length > 0 && (
+                  <div className="border border-gray-300 rounded-lg p-4">
+                    <h3 className="font-semibold text-gray-800 mb-3">Payments Added</h3>
+                    <div className="space-y-2">
+                      {payments.map((payment, index) => (
+                        <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded">
+                          <div>
+                            <span className="font-medium capitalize">{payment.method}</span>
+                            <span className="text-lg font-bold text-primary-600 ml-4">
+                              LKR {payment.amount.toFixed(2)}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => removePayment(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
+
+                {/* Payment Summary */}
+                <div className="bg-primary-50 rounded-lg p-4">
+                  <div className="flex justify-between text-sm text-gray-700 mb-2">
+                    <span>Total Bill:</span>
+                    <span className="font-semibold">LKR {total.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-700 mb-2">
+                    <span>Total Paid:</span>
+                    <span className="font-semibold text-secondary-600">LKR {getTotalPaid().toFixed(2)}</span>
+                  </div>
+                  <div className="border-t border-primary-200 pt-2">
+                    <div className={`flex justify-between text-lg font-bold ${
+                      getRemainingAmount() > 0 ? 'text-red-600' : 'text-secondary-600'
+                    }`}>
+                      <span>{getRemainingAmount() > 0 ? 'Remaining:' : 'Change:'}</span>
+                      <span>LKR {Math.abs(getRemainingAmount()).toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => setShowPaymentModal(false)}
+                onClick={() => {
+                  setShowPaymentModal(false);
+                  setShowSplitPayment(false);
+                  setPayments([]);
+                }}
                 className="flex-1 px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg font-medium transition"
                 data-testid="cancel-payment-btn"
               >
