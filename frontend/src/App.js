@@ -745,6 +745,17 @@ function App() {
                   Inventory
                 </button>
                 <button
+                  onClick={() => setCurrentView('invoices')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'invoices'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-invoices"
+                >
+                  Invoices
+                </button>
+                <button
                   onClick={() => setCurrentView('reports')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'reports'
