@@ -202,6 +202,32 @@ function App() {
 
   const getText = (key) => getTranslation(language, key) || t[language]?.[key] || t.en?.[key] || key;
 
+  // Check authentication on mount
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    const user = localStorage.getItem('user');
+    
+    if (token && user) {
+      setIsAuthenticated(true);
+      setCurrentUser(JSON.parse(user));
+    }
+  }, []);
+
+  // Authentication handlers
+  const handleLogin = (user) => {
+    setIsAuthenticated(true);
+    setCurrentUser(user);
+    setCurrentView('dashboard');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    setCurrentView('dashboard');
+  };
+
   // Auto-focus barcode input on mount
   useEffect(() => {
     if (currentView === 'pos' && barcodeInputRef.current) {
