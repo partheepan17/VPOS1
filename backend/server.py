@@ -368,7 +368,8 @@ def create_user(user: UserCreate, current_user: dict = Depends(require_role(["ma
     }
     
     users_col.insert_one(new_user)
-    new_user.pop('password')
+    new_user.pop('password', None)
+    new_user.pop('_id', None)  # Remove MongoDB _id field
     
     return {"message": "User created successfully", "user": new_user}
 
