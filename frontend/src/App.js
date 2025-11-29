@@ -892,14 +892,34 @@ function App() {
                     ref={barcodeInputRef}
                     type="text"
                     value={barcodeInput}
-                    onChange={(e) => setBarcodeInput(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setBarcodeInput(value);
+                      
+                      // Auto-enter functionality for barcode scanners
+                      // Clear any existing timer
+                      if (barcodeTimerRef.current) {
+                        clearTimeout(barcodeTimerRef.current);
+                      }
+                      
+                      // If barcode looks complete (8-13 digits common for barcodes)
+                      if (value.length >= 8) {
+                        barcodeTimerRef.current = setTimeout(() => {
+                          handleBarcodeScanned(value);
+                        }, 300); // 300ms delay after last character
+                      }
+                    }}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter' && barcodeInput) {
+                        // Clear timer if user manually presses Enter
+                        if (barcodeTimerRef.current) {
+                          clearTimeout(barcodeTimerRef.current);
+                        }
                         handleBarcodeScanned(barcodeInput);
                       }
                     }}
                     className="flex-1 px-4 py-3 border-2 border-primary-300 rounded-lg focus:outline-none focus:border-primary-500 text-lg"
-                    placeholder="Scan or enter barcode..."
+                    placeholder="Scan or enter barcode... (auto-adds)"
                     autoFocus
                     data-testid="barcode-input"
                   />
