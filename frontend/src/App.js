@@ -1016,10 +1016,10 @@ function App() {
                 </button>
                 <button
                   onClick={() => setCurrentView('devices')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'devices'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-cyan-600 shadow-md nav-button-active'
+                      : 'bg-cyan-600 text-white hover:bg-cyan-700 hover:shadow-lg'
                   }`}
                   data-testid="nav-devices"
                 >
