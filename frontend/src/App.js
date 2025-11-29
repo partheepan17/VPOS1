@@ -647,6 +647,11 @@ function App() {
 
   const { subtotal, totalDiscount, total } = calculateTotals();
 
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} language={language} getText={getText} />;
+  }
+
   return (
     <div className="App">
       {/* Notification Toast */}
