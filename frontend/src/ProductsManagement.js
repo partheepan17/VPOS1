@@ -33,6 +33,8 @@ function ProductsManagement({ language, getText }) {
     stock: 0,
     reorder_level: 10,
     weight_based: false,
+    packed_date: '',
+    expire_date: '',
     active: true
   });
 
