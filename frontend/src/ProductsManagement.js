@@ -147,6 +147,8 @@ function ProductsManagement({ language, getText }) {
       stock: product.stock,
       reorder_level: product.reorder_level,
       weight_based: product.weight_based,
+      packed_date: product.packed_date || '',
+      expire_date: product.expire_date || '',
       active: product.active
     });
     setShowModal(true);
