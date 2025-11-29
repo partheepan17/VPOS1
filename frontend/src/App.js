@@ -695,6 +695,25 @@ function App() {
     window.print();
   };
 
+  const handlePrintLastInvoice = () => {
+    // Check if there's a last sale or recent sale in history
+    if (lastSale) {
+      setShowInvoice(true);
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    } else if (salesHistory && salesHistory.length > 0) {
+      // Use the most recent sale from history
+      setLastSale(salesHistory[0]);
+      setShowInvoice(true);
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    } else {
+      showNotification('No invoice available to print', 'error');
+    }
+  };
+
   const getProductName = (item) => {
     if (language === 'si' && item.name_si) return item.name_si;
     if (language === 'ta' && item.name_ta) return item.name_ta;
