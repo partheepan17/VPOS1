@@ -477,9 +477,29 @@ function App() {
   };
 
   const processPayment = async () => {
+    const { total } = calculateTotals();
+    
+    // For split payment mode
+    if (showSplitPayment) {
+      const totalPaid = getTotalPaid();
+      if (totalPaid < total) {
+        showNotification(`Remaining amount: LKR ${(total - totalPaid).toFixed(2)}`, 'error');
+        return;
+      }
+    }
+
     setLoading(true);
     try {
-      const { subtotal, totalDiscount, total } = calculateTotals();
+      const { subtotal, totalDiscount } = calculateTotals();
+      
+      // Use split payments if available, otherwise single payment
+      const paymentsToUse = showSplitPayment && payments.length > 0 
+        ? payments 
+        : [{
+            method: paymentMethod,
+            amount: parseFloat(paymentAmount) || total,
+            reference: ''
+          }];
       
       const saleData = {
         invoice_number: '',
@@ -491,11 +511,7 @@ function App() {
         total_discount: totalDiscount,
         tax_amount: 0,
         total,
-        payments: [{
-          method: paymentMethod,
-          amount: parseFloat(paymentAmount) || total,
-          reference: ''
-        }],
+        payments: paymentsToUse,
         status: 'completed',
         terminal_name: 'Terminal 1',
         cashier_name: 'Cashier',
@@ -505,6 +521,7 @@ function App() {
       const response = await axios.post(`${API_URL}/api/sales`, saleData);
       setLastSale(response.data.sale);
       setShowPaymentModal(false);
+      setShowSplitPayment(false);
       clearCart();
       showNotification('Sale completed successfully!', 'success');
       setShowInvoice(true);
