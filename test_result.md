@@ -118,10 +118,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "MongoDB Serialization Fix"
-    - "Products Management API"
-    - "Customers Management API"
-    - "Dashboard Data APIs"
+    - "Label Printing Feature"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
