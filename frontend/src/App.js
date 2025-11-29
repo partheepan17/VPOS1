@@ -485,10 +485,10 @@ function App() {
               </select>
               
               {/* Navigation */}
-              <nav className="flex gap-2">
+              <nav className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setCurrentView('pos')}
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'pos'
                       ? 'bg-white text-primary-600'
                       : 'bg-primary-700 text-white hover:bg-primary-800'
@@ -499,14 +499,47 @@ function App() {
                 </button>
                 <button
                   onClick={() => setCurrentView('sales')}
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'sales'
                       ? 'bg-white text-primary-600'
                       : 'bg-primary-700 text-white hover:bg-primary-800'
                   }`}
                   data-testid="nav-sales"
                 >
-                  {getText('salesHistory')}
+                  Sales
+                </button>
+                <button
+                  onClick={() => setCurrentView('discounts')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'discounts'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-discounts"
+                >
+                  Discounts
+                </button>
+                <button
+                  onClick={() => setCurrentView('prices')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'prices'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-prices"
+                >
+                  Prices
+                </button>
+                <button
+                  onClick={() => setCurrentView('csv')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'csv'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-csv"
+                >
+                  CSV
                 </button>
               </nav>
             </div>
