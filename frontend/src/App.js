@@ -1108,7 +1108,9 @@ function App() {
                 
                 {/* Search Tips */}
                 <div className="mt-3 text-sm text-gray-600">
-                  <span className="font-medium">Search by:</span> Product Name (සිංහල/தமிழ்/English) · SKU · Product ID
+                  <span className="font-medium">Search by:</span> Product Name (සිංහල/தமිழ්/English) · SKU · Product ID
+                  <br />
+                  <span className="font-medium">Tip:</span> Press <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Enter</kbd> to add first result to cart
                 </div>
               </div>
 
