@@ -902,7 +902,7 @@ function App() {
                   }`}
                   data-testid="nav-stock-entry"
                 >
-                  📦 Stock Entry
+                  📦 {getText('stockEntry')}
                 </button>
                 <button
                   onClick={() => setCurrentView('stock-adjustments')}
@@ -913,7 +913,7 @@ function App() {
                   }`}
                   data-testid="nav-stock-adjustments"
                 >
-                  📝 Adjustments
+                  📝 {getText('stockAdjustments')}
                 </button>
                 <button
                   onClick={() => setCurrentView('stock-movements')}
@@ -924,7 +924,7 @@ function App() {
                   }`}
                   data-testid="nav-stock-movements"
                 >
-                  📊 Stock History
+                  📊 {getText('stockMovements')}
                 </button>
                 <button
                   onClick={() => setCurrentView('inventory')}
