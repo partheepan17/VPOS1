@@ -1654,28 +1654,39 @@ def get_sync_status():
 
 @app.post("/api/seed-data")
 def seed_sample_data():
-    # Clear existing data
+    """Seed comprehensive test data for production-like demo"""
+    # Clear existing data (except users and sales)
     products_col.delete_many({})
     customers_col.delete_many({})
     suppliers_col.delete_many({})
+    discount_rules_col.delete_many({})
     
-    # Sample suppliers
+    # Sample suppliers with realistic Sri Lankan data
     suppliers = [
         {
             "id": "sup-001",
-            "name": "Lanka Distributors",
+            "name": "Lanka Food Distributors (Pvt) Ltd",
             "phone": "0112345678",
-            "email": "info@lankadist.lk",
-            "address": "Colombo 03",
+            "email": "info@lankafood.lk",
+            "address": "No. 123, Galle Road, Colombo 03",
             "active": True,
             "created_at": datetime.utcnow().isoformat()
         },
         {
             "id": "sup-002",
-            "name": "Ceylon Traders",
-            "phone": "0112345679",
-            "email": "sales@ceylontraders.lk",
-            "address": "Kandy",
+            "name": "Ceylon Wholesalers & Co",
+            "phone": "0812234567",
+            "email": "sales@ceylonwholesale.lk",
+            "address": "45/A, Peradeniya Road, Kandy",
+            "active": True,
+            "created_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": "sup-003",
+            "name": "Island Traders (Pvt) Ltd",
+            "phone": "0912345678",
+            "email": "info@islandtraders.lk",
+            "address": "78, Main Street, Galle",
             "active": True,
             "created_at": datetime.utcnow().isoformat()
         }
