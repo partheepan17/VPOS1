@@ -1383,6 +1383,18 @@ function App() {
           <LabelPrinting language={language} getText={getText} />
         )}
 
+        {currentView === 'stock-entry' && (
+          <StockEntry language={language} />
+        )}
+
+        {currentView === 'stock-adjustments' && (
+          <StockAdjustments language={language} currentUser={currentUser} />
+        )}
+
+        {currentView === 'stock-movements' && (
+          <StockMovements language={language} />
+        )}
+
         {currentView === 'inventory' && (
           <InventoryManagement language={language} getText={getText} />
         )}
