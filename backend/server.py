@@ -67,6 +67,7 @@ backups_col = db['backups']
 held_bills_col = db['held_bills']
 terminals_col = db['terminals']
 sync_queue_col = db['sync_queue']
+users_col = db['users']
 
 # Create indexes
 products_col.create_index([('sku', ASCENDING)], unique=True)
@@ -74,6 +75,70 @@ products_col.create_index([('barcodes', ASCENDING)])
 sales_col.create_index([('invoice_number', ASCENDING)], unique=True)
 sales_col.create_index([('created_at', DESCENDING)])
 customers_col.create_index([('phone', ASCENDING)])
+users_col.create_index([('username', ASCENDING)], unique=True)
+
+# ==================== AUTHENTICATION ====================
+
+# Security configuration
+SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production-2024')
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+security = HTTPBearer()
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        user = users_col.find_one({"username": username}, {"_id": 0, "password": 0})
+        if user is None:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+def require_role(required_roles: List[str]):
+    def role_checker(current_user: dict = Depends(get_current_user)):
+        if current_user["role"] not in required_roles:
+            raise HTTPException(status_code=403, detail="Insufficient permissions")
+        return current_user
+    return role_checker
+
+# Initialize default admin user if not exists
+def init_default_users():
+    admin_exists = users_col.find_one({"username": "admin"})
+    if not admin_exists:
+        admin_user = {
+            "id": str(uuid.uuid4()),
+            "username": "admin",
+            "password": get_password_hash("admin1234"),
+            "full_name": "Administrator",
+            "role": "manager",  # manager or cashier
+            "active": True,
+            "created_at": datetime.utcnow().isoformat()
+        }
+        users_col.insert_one(admin_user)
+        print("✅ Default admin user created (username: admin, password: admin1234)")
+
+# Initialize users on startup
+init_default_users()
 
 # ==================== HELPER FUNCTIONS ====================
 
