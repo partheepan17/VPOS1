@@ -1,0 +1,745 @@
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from pymongo import MongoClient, ASCENDING, DESCENDING
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict
+from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+import uuid
+import json
+
+load_dotenv()
+
+app = FastAPI(title="POS System API")
+
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# MongoDB connection
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/')
+db_name = os.environ.get('DATABASE_NAME', 'pos_system')
+client = MongoClient(mongo_url)
+db = client[db_name]
+
+# Collections
+products_col = db['products']
+sales_col = db['sales']
+customers_col = db['customers']
+suppliers_col = db['suppliers']
+inventory_logs_col = db['inventory_logs']
+discount_rules_col = db['discount_rules']
+settings_col = db['settings']
+backups_col = db['backups']
+
+# Create indexes
+products_col.create_index([('sku', ASCENDING)], unique=True)
+products_col.create_index([('barcodes', ASCENDING)])
+sales_col.create_index([('invoice_number', ASCENDING)], unique=True)
+sales_col.create_index([('created_at', DESCENDING)])
+customers_col.create_index([('phone', ASCENDING)])
+
+# ==================== MODELS ====================
+
+class Product(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sku: str
+    barcodes: List[str] = []
+    name_en: str
+    name_si: str = ""
+    name_ta: str = ""
+    unit: str = "pcs"
+    category: str = ""
+    tax_code: str = ""
+    supplier_id: Optional[str] = None
+    price_retail: float = 0.0
+    price_wholesale: float = 0.0
+    price_credit: float = 0.0
+    price_other: float = 0.0
+    stock: float = 0.0
+    reorder_level: float = 0.0
+    weight_based: bool = False
+    active: bool = True
+    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    updated_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+
+class SaleItem(BaseModel):
+    product_id: str
+    sku: str
+    name: str
+    quantity: float
+    weight: float = 0.0
+    unit_price: float
+    discount_percent: float = 0.0
+    discount_amount: float = 0.0
+    subtotal: float
+    total: float
+
+class Payment(BaseModel):
+    method: str  # cash, card, qr, other
+    amount: float
+    reference: str = ""
+
+class Sale(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    invoice_number: str
+    customer_id: Optional[str] = None
+    customer_name: str = ""
+    price_tier: str = "retail"  # retail, wholesale, credit, other
+    items: List[SaleItem]
+    subtotal: float
+    total_discount: float
+    tax_amount: float = 0.0
+    total: float
+    payments: List[Payment]
+    status: str = "completed"  # completed, hold, cancelled
+    terminal_name: str = "Terminal 1"
+    cashier_name: str = "Cashier"
+    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    notes: str = ""
+
+class Customer(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    phone: str = ""
+    email: str = ""
+    category: str = "retail"  # retail, wholesale, credit, other
+    default_tier: str = "retail"
+    address: str = ""
+    tax_id: str = ""
+    notes: str = ""
+    active: bool = True
+    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+
+class Supplier(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    phone: str = ""
+    email: str = ""
+    address: str = ""
+    tax_id: str = ""
+    notes: str = ""
+    active: bool = True
+    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+
+class DiscountRule(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    rule_type: str  # line_item, category, product
+    target_id: Optional[str] = None  # product_id or category name
+    discount_type: str  # percent, fixed
+    discount_value: float
+    max_discount: float = 0.0  # cap on discount
+    min_quantity: float = 0.0
+    max_quantity: float = 0.0
+    auto_apply: bool = False
+    active: bool = True
+    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+
+class InventoryLog(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    product_id: str
+    log_type: str  # receive, adjust, sale
+    quantity: float
+    previous_stock: float
+    new_stock: float
+    reference: str = ""
+    notes: str = ""
+    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    created_by: str = "System"
+
+# ==================== API ENDPOINTS ====================
+
+@app.get("/api/")
+def root():
+    return {"message": "POS System API", "version": "1.0.0"}
+
+@app.get("/api/health")
+def health_check():
+    try:
+        client.admin.command('ping')
+        return {"status": "healthy", "database": "connected"}
+    except Exception as e:
+        return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
+
+# ==================== PRODUCTS ====================
+
+@app.get("/api/products")
+def get_products(skip: int = 0, limit: int = 100, search: str = "", active_only: bool = True):
+    query = {}
+    if active_only:
+        query["active"] = True
+    if search:
+        query["$or"] = [
+            {"sku": {"$regex": search, "$options": "i"}},
+            {"name_en": {"$regex": search, "$options": "i"}},
+            {"barcodes": {"$regex": search, "$options": "i"}}
+        ]
+    
+    products = list(products_col.find(query, {"_id": 0}).skip(skip).limit(limit))
+    total = products_col.count_documents(query)
+    return {"products": products, "total": total}
+
+@app.get("/api/products/{product_id}")
+def get_product(product_id: str):
+    product = products_col.find_one({"id": product_id}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+@app.get("/api/products/barcode/{barcode}")
+def get_product_by_barcode(barcode: str):
+    product = products_col.find_one({"barcodes": barcode, "active": True}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+@app.post("/api/products")
+def create_product(product: Product):
+    # Check if SKU exists
+    existing = products_col.find_one({"sku": product.sku})
+    if existing:
+        raise HTTPException(status_code=400, detail="SKU already exists")
+    
+    product_dict = product.dict()
+    products_col.insert_one(product_dict)
+    return {"message": "Product created", "product": product_dict}
+
+@app.put("/api/products/{product_id}")
+def update_product(product_id: str, product: Product):
+    product_dict = product.dict()
+    product_dict["updated_at"] = datetime.utcnow().isoformat()
+    result = products_col.update_one({"id": product_id}, {"$set": product_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"message": "Product updated"}
+
+@app.delete("/api/products/{product_id}")
+def delete_product(product_id: str):
+    # Soft delete
+    result = products_col.update_one({"id": product_id}, {"$set": {"active": False}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"message": "Product deleted"}
+
+# ==================== SALES ====================
+
+@app.get("/api/sales")
+def get_sales(skip: int = 0, limit: int = 50, status: str = ""):
+    query = {}
+    if status:
+        query["status"] = status
+    
+    sales = list(sales_col.find(query, {"_id": 0}).sort("created_at", DESCENDING).skip(skip).limit(limit))
+    total = sales_col.count_documents(query)
+    return {"sales": sales, "total": total}
+
+@app.get("/api/sales/{sale_id}")
+def get_sale(sale_id: str):
+    sale = sales_col.find_one({"id": sale_id}, {"_id": 0})
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    return sale
+
+@app.post("/api/sales")
+def create_sale(sale: Sale):
+    # Generate invoice number
+    today = datetime.utcnow().strftime("%Y%m%d")
+    count = sales_col.count_documents({"invoice_number": {"$regex": f"^INV-{today}"}})
+    sale.invoice_number = f"INV-{today}-{count + 1:04d}"
+    
+    sale_dict = sale.dict()
+    
+    # Update inventory for completed sales
+    if sale.status == "completed":
+        for item in sale.items:
+            product = products_col.find_one({"id": item.product_id})
+            if product:
+                previous_stock = product.get("stock", 0)
+                new_stock = previous_stock - item.quantity
+                
+                # Update product stock
+                products_col.update_one(
+                    {"id": item.product_id},
+                    {"$set": {"stock": new_stock}}
+                )
+                
+                # Log inventory change
+                inventory_logs_col.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "product_id": item.product_id,
+                    "log_type": "sale",
+                    "quantity": -item.quantity,
+                    "previous_stock": previous_stock,
+                    "new_stock": new_stock,
+                    "reference": sale.invoice_number,
+                    "notes": f"Sale {sale.invoice_number}",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": sale.cashier_name
+                })
+    
+    sales_col.insert_one(sale_dict)
+    return {"message": "Sale created", "sale": sale_dict}
+
+@app.put("/api/sales/{sale_id}")
+def update_sale(sale_id: str, sale: Sale):
+    sale_dict = sale.dict()
+    result = sales_col.update_one({"id": sale_id}, {"$set": sale_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    return {"message": "Sale updated"}
+
+# ==================== CUSTOMERS ====================
+
+@app.get("/api/customers")
+def get_customers(skip: int = 0, limit: int = 100, search: str = ""):
+    query = {"active": True}
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"phone": {"$regex": search, "$options": "i"}}
+        ]
+    
+    customers = list(customers_col.find(query, {"_id": 0}).skip(skip).limit(limit))
+    total = customers_col.count_documents(query)
+    return {"customers": customers, "total": total}
+
+@app.get("/api/customers/{customer_id}")
+def get_customer(customer_id: str):
+    customer = customers_col.find_one({"id": customer_id}, {"_id": 0})
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return customer
+
+@app.post("/api/customers")
+def create_customer(customer: Customer):
+    customer_dict = customer.dict()
+    customers_col.insert_one(customer_dict)
+    return {"message": "Customer created", "customer": customer_dict}
+
+@app.put("/api/customers/{customer_id}")
+def update_customer(customer_id: str, customer: Customer):
+    customer_dict = customer.dict()
+    result = customers_col.update_one({"id": customer_id}, {"$set": customer_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return {"message": "Customer updated"}
+
+# ==================== SUPPLIERS ====================
+
+@app.get("/api/suppliers")
+def get_suppliers(skip: int = 0, limit: int = 100):
+    suppliers = list(suppliers_col.find({"active": True}, {"_id": 0}).skip(skip).limit(limit))
+    total = suppliers_col.count_documents({"active": True})
+    return {"suppliers": suppliers, "total": total}
+
+@app.post("/api/suppliers")
+def create_supplier(supplier: Supplier):
+    supplier_dict = supplier.dict()
+    suppliers_col.insert_one(supplier_dict)
+    return {"message": "Supplier created", "supplier": supplier_dict}
+
+# ==================== DISCOUNT RULES ====================
+
+@app.get("/api/discount-rules")
+def get_discount_rules():
+    rules = list(discount_rules_col.find({"active": True}, {"_id": 0}))
+    return {"rules": rules}
+
+@app.post("/api/discount-rules")
+def create_discount_rule(rule: DiscountRule):
+    rule_dict = rule.dict()
+    discount_rules_col.insert_one(rule_dict)
+    return {"message": "Discount rule created", "rule": rule_dict}
+
+# ==================== INVENTORY ====================
+
+@app.post("/api/inventory/receive")
+def receive_inventory(product_id: str, quantity: float, notes: str = ""):
+    product = products_col.find_one({"id": product_id})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    previous_stock = product.get("stock", 0)
+    new_stock = previous_stock + quantity
+    
+    products_col.update_one({"id": product_id}, {"$set": {"stock": new_stock}})
+    
+    inventory_logs_col.insert_one({
+        "id": str(uuid.uuid4()),
+        "product_id": product_id,
+        "log_type": "receive",
+        "quantity": quantity,
+        "previous_stock": previous_stock,
+        "new_stock": new_stock,
+        "notes": notes,
+        "created_at": datetime.utcnow().isoformat(),
+        "created_by": "Manager"
+    })
+    
+    return {"message": "Inventory received", "new_stock": new_stock}
+
+@app.post("/api/inventory/adjust")
+def adjust_inventory(product_id: str, quantity: float, notes: str = ""):
+    product = products_col.find_one({"id": product_id})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    previous_stock = product.get("stock", 0)
+    new_stock = quantity
+    
+    products_col.update_one({"id": product_id}, {"$set": {"stock": new_stock}})
+    
+    inventory_logs_col.insert_one({
+        "id": str(uuid.uuid4()),
+        "product_id": product_id,
+        "log_type": "adjust",
+        "quantity": new_stock - previous_stock,
+        "previous_stock": previous_stock,
+        "new_stock": new_stock,
+        "notes": notes,
+        "created_at": datetime.utcnow().isoformat(),
+        "created_by": "Manager"
+    })
+    
+    return {"message": "Inventory adjusted", "new_stock": new_stock}
+
+@app.get("/api/inventory/low-stock")
+def get_low_stock_products():
+    # Get products where stock <= reorder_level
+    pipeline = [
+        {"$match": {"active": True, "$expr": {"$lte": ["$stock", "$reorder_level"]}}},
+        {"$project": {"_id": 0}}
+    ]
+    products = list(products_col.aggregate(pipeline))
+    return {"products": products, "count": len(products)}
+
+# ==================== REPORTS ====================
+
+@app.get("/api/reports/sales-summary")
+def get_sales_summary(start_date: str = "", end_date: str = ""):
+    query = {"status": "completed"}
+    
+    if start_date:
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        if "created_at" not in query:
+            query["created_at"] = {}
+        query["created_at"]["$lte"] = end_date
+    
+    sales = list(sales_col.find(query, {"_id": 0}))
+    
+    total_sales = sum(sale.get("total", 0) for sale in sales)
+    total_discount = sum(sale.get("total_discount", 0) for sale in sales)
+    total_invoices = len(sales)
+    
+    # Sales by tier
+    tier_summary = {}
+    for sale in sales:
+        tier = sale.get("price_tier", "retail")
+        if tier not in tier_summary:
+            tier_summary[tier] = {"count": 0, "total": 0}
+        tier_summary[tier]["count"] += 1
+        tier_summary[tier]["total"] += sale.get("total", 0)
+    
+    return {
+        "total_sales": total_sales,
+        "total_discount": total_discount,
+        "total_invoices": total_invoices,
+        "average_sale": total_sales / total_invoices if total_invoices > 0 else 0,
+        "tier_summary": tier_summary
+    }
+
+# ==================== SETTINGS ====================
+
+@app.get("/api/settings")
+def get_settings():
+    settings = settings_col.find_one({}, {"_id": 0})
+    if not settings:
+        # Return default settings
+        settings = {
+            "store_name": "My Store",
+            "store_address": "",
+            "store_phone": "",
+            "store_email": "",
+            "tax_id": "",
+            "default_language": "si",
+            "default_tier": "retail",
+            "currency": "LKR",
+            "tax_rate": 0.0
+        }
+    return settings
+
+@app.post("/api/settings")
+def update_settings(settings: dict):
+    settings_col.delete_many({})
+    settings_col.insert_one(settings)
+    return {"message": "Settings updated", "settings": settings}
+
+# ==================== SEED DATA ====================
+
+@app.post("/api/seed-data")
+def seed_sample_data():
+    # Clear existing data
+    products_col.delete_many({})
+    customers_col.delete_many({})
+    suppliers_col.delete_many({})
+    
+    # Sample suppliers
+    suppliers = [
+        {
+            "id": "sup-001",
+            "name": "Lanka Distributors",
+            "phone": "0112345678",
+            "email": "info@lankadist.lk",
+            "address": "Colombo 03",
+            "active": True,
+            "created_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": "sup-002",
+            "name": "Ceylon Traders",
+            "phone": "0112345679",
+            "email": "sales@ceylontraders.lk",
+            "address": "Kandy",
+            "active": True,
+            "created_at": datetime.utcnow().isoformat()
+        }
+    ]
+    suppliers_col.insert_many(suppliers)
+    
+    # Sample products
+    products = [
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "RICE-001",
+            "barcodes": ["8901234567890", "8901234567891"],
+            "name_en": "Basmati Rice 5kg",
+            "name_si": "බාස්මති සහල් 5kg",
+            "name_ta": "பாஸ்மதி அரிசி 5kg",
+            "unit": "bag",
+            "category": "Rice",
+            "supplier_id": "sup-001",
+            "price_retail": 1500.00,
+            "price_wholesale": 1400.00,
+            "price_credit": 1450.00,
+            "price_other": 1350.00,
+            "stock": 50,
+            "reorder_level": 10,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "SUGAR-001",
+            "barcodes": ["8901234567892"],
+            "name_en": "White Sugar 1kg",
+            "name_si": "සුදු සීනි 1kg",
+            "name_ta": "வெள்ளை சர்க்கரை 1kg",
+            "unit": "kg",
+            "category": "Sugar",
+            "supplier_id": "sup-001",
+            "price_retail": 250.00,
+            "price_wholesale": 230.00,
+            "price_credit": 240.00,
+            "price_other": 220.00,
+            "stock": 100,
+            "reorder_level": 20,
+            "weight_based": True,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "OIL-001",
+            "barcodes": ["8901234567893"],
+            "name_en": "Coconut Oil 1L",
+            "name_si": "පොල් තෙල් 1L",
+            "name_ta": "தேங்காய் எண்ணெய் 1L",
+            "unit": "bottle",
+            "category": "Oil",
+            "supplier_id": "sup-002",
+            "price_retail": 850.00,
+            "price_wholesale": 800.00,
+            "price_credit": 825.00,
+            "price_other": 780.00,
+            "stock": 30,
+            "reorder_level": 5,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "MILK-001",
+            "barcodes": ["8901234567894"],
+            "name_en": "Full Cream Milk Powder 400g",
+            "name_si": "සම්පූර්ණ ක්‍රීම් කිරි කුඩු 400g",
+            "name_ta": "முழு கிரீம் பால் தூள் 400g",
+            "unit": "pack",
+            "category": "Dairy",
+            "supplier_id": "sup-001",
+            "price_retail": 980.00,
+            "price_wholesale": 920.00,
+            "price_credit": 950.00,
+            "price_other": 900.00,
+            "stock": 45,
+            "reorder_level": 15,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "TEA-001",
+            "barcodes": ["8901234567895"],
+            "name_en": "Ceylon Black Tea 100g",
+            "name_si": "ලංකා කළු තේ 100g",
+            "name_ta": "இலங்கை கருப்பு தேயிலை 100g",
+            "unit": "pack",
+            "category": "Beverages",
+            "supplier_id": "sup-002",
+            "price_retail": 450.00,
+            "price_wholesale": 420.00,
+            "price_credit": 435.00,
+            "price_other": 410.00,
+            "stock": 80,
+            "reorder_level": 25,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "FLOUR-001",
+            "barcodes": ["8901234567896"],
+            "name_en": "Wheat Flour 1kg",
+            "name_si": "තිරිඟු පිටි 1kg",
+            "name_ta": "கோதுமை மாவு 1kg",
+            "unit": "kg",
+            "category": "Flour",
+            "supplier_id": "sup-001",
+            "price_retail": 180.00,
+            "price_wholesale": 170.00,
+            "price_credit": 175.00,
+            "price_other": 165.00,
+            "stock": 120,
+            "reorder_level": 30,
+            "weight_based": True,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "SOAP-001",
+            "barcodes": ["8901234567897"],
+            "name_en": "Bath Soap 100g",
+            "name_si": "නාන සබන් 100g",
+            "name_ta": "குளியல் சோப்பு 100g",
+            "unit": "pcs",
+            "category": "Personal Care",
+            "supplier_id": "sup-002",
+            "price_retail": 120.00,
+            "price_wholesale": 110.00,
+            "price_credit": 115.00,
+            "price_other": 105.00,
+            "stock": 200,
+            "reorder_level": 50,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "DHAL-001",
+            "barcodes": ["8901234567898"],
+            "name_en": "Red Lentils 1kg",
+            "name_si": "රතු පරිප්පු 1kg",
+            "name_ta": "சிவப்பு பருப்பு 1kg",
+            "unit": "kg",
+            "category": "Pulses",
+            "supplier_id": "sup-001",
+            "price_retail": 420.00,
+            "price_wholesale": 390.00,
+            "price_credit": 405.00,
+            "price_other": 380.00,
+            "stock": 60,
+            "reorder_level": 15,
+            "weight_based": True,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+    ]
+    products_col.insert_many(products)
+    
+    # Sample customers
+    customers = [
+        {
+            "id": "cust-001",
+            "name": "Walk-in Customer",
+            "phone": "",
+            "category": "retail",
+            "default_tier": "retail",
+            "active": True,
+            "created_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": "cust-002",
+            "name": "Nimal Perera",
+            "phone": "0771234567",
+            "category": "retail",
+            "default_tier": "retail",
+            "active": True,
+            "created_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": "cust-003",
+            "name": "Kamal's Store",
+            "phone": "0772345678",
+            "category": "wholesale",
+            "default_tier": "wholesale",
+            "active": True,
+            "created_at": datetime.utcnow().isoformat()
+        }
+    ]
+    customers_col.insert_many(customers)
+    
+    # Initialize settings
+    settings_col.delete_many({})
+    settings_col.insert_one({
+        "store_name": "My Grocery Store",
+        "store_address": "123 Main Street, Colombo",
+        "store_phone": "0112345678",
+        "store_email": "info@mystore.lk",
+        "tax_id": "123456789V",
+        "default_language": "si",
+        "default_tier": "retail",
+        "currency": "LKR",
+        "tax_rate": 0.0
+    })
+    
+    return {
+        "message": "Sample data seeded successfully",
+        "products": len(products),
+        "customers": len(customers),
+        "suppliers": len(suppliers)
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
