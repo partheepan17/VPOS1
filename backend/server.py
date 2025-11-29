@@ -40,6 +40,7 @@ inventory_logs_col = db['inventory_logs']
 discount_rules_col = db['discount_rules']
 settings_col = db['settings']
 backups_col = db['backups']
+held_bills_col = db['held_bills']
 
 # Create indexes
 products_col.create_index([('sku', ASCENDING)], unique=True)
