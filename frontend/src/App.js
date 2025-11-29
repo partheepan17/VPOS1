@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import axios from 'axios';
 import { getTranslation } from './translations';
+import Login from './Login';
 import DiscountRules from './DiscountRules';
 import PriceManagement from './PriceManagement';
 import CSVManagement from './CSVManagement';
@@ -17,8 +18,24 @@ import InvoicePrint from './InvoicePrint';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
+// Configure axios to include auth token
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 function App() {
-  const [currentView, setCurrentView] = useState('pos');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [currentView, setCurrentView] = useState('dashboard');
   const [language, setLanguage] = useState('si'); // si, ta, en
   const [cart, setCart] = useState([]);
   const [selectedTier, setSelectedTier] = useState('retail');
