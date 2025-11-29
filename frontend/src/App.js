@@ -1069,6 +1069,10 @@ function App() {
           <InventoryManagement language={language} getText={getText} />
         )}
 
+        {currentView === 'invoices' && (
+          <InvoicePrint language={language} getText={getText} />
+        )}
+
         {currentView === 'reports' && (
           <ReportsManagement language={language} getText={getText} />
         )}
