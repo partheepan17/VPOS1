@@ -183,7 +183,7 @@ function App() {
     }
   };
 
-  const getText = (key) => t[language][key] || t.en[key] || key;
+  const getText = (key) => getTranslation(language, key) || t[language]?.[key] || t.en?.[key] || key;
 
   // Auto-focus barcode input on mount
   useEffect(() => {
