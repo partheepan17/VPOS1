@@ -768,6 +768,138 @@ def get_customer_stats(start_date: str = "", end_date: str = ""):
     
     return {"customers": top_customers}
 
+# ==================== HELD BILLS ====================
+
+class HeldBill(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    customer_id: Optional[str] = None
+    customer_name: str = ""
+    price_tier: str = "retail"
+    items: List[SaleItem]
+    subtotal: float
+    total_discount: float
+    total: float
+    terminal_name: str = "Terminal 1"
+    cashier_name: str = "Cashier"
+    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    notes: str = ""
+
+@app.get("/api/held-bills")
+def get_held_bills():
+    """Get all held bills"""
+    bills = list(held_bills_col.find({}, {"_id": 0}).sort("created_at", DESCENDING))
+    return {"bills": bills, "count": len(bills)}
+
+@app.post("/api/held-bills")
+def create_held_bill(bill: HeldBill):
+    """Hold current bill for later"""
+    bill_dict = bill.dict()
+    held_bills_col.insert_one(bill_dict)
+    bill_dict.pop('_id', None)
+    return {"message": "Bill held successfully", "bill": bill_dict}
+
+@app.get("/api/held-bills/{bill_id}")
+def get_held_bill(bill_id: str):
+    """Get specific held bill"""
+    bill = held_bills_col.find_one({"id": bill_id}, {"_id": 0})
+    if not bill:
+        raise HTTPException(status_code=404, detail="Held bill not found")
+    return bill
+
+@app.delete("/api/held-bills/{bill_id}")
+def delete_held_bill(bill_id: str):
+    """Delete held bill"""
+    result = held_bills_col.delete_one({"id": bill_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Held bill not found")
+    return {"message": "Held bill deleted"}
+
+# ==================== BACKUPS ====================
+
+@app.post("/api/backups/create")
+def create_backup():
+    """Create full system backup as JSON"""
+    backup_data = {
+        "id": str(uuid.uuid4()),
+        "created_at": datetime.utcnow().isoformat(),
+        "type": "manual",
+        "data": {
+            "products": list(products_col.find({}, {"_id": 0})),
+            "customers": list(customers_col.find({}, {"_id": 0})),
+            "suppliers": list(suppliers_col.find({}, {"_id": 0})),
+            "discount_rules": list(discount_rules_col.find({}, {"_id": 0})),
+            "settings": settings_col.find_one({}, {"_id": 0})
+        }
+    }
+    
+    # Store backup metadata
+    backup_meta = {
+        "id": backup_data["id"],
+        "created_at": backup_data["created_at"],
+        "type": backup_data["type"],
+        "products_count": len(backup_data["data"]["products"]),
+        "customers_count": len(backup_data["data"]["customers"]),
+        "suppliers_count": len(backup_data["data"]["suppliers"])
+    }
+    backups_col.insert_one(backup_meta)
+    
+    return {
+        "message": "Backup created successfully",
+        "backup": backup_data,
+        "metadata": backup_meta
+    }
+
+@app.get("/api/backups")
+def get_backups():
+    """List all backup metadata"""
+    backups = list(backups_col.find({}, {"_id": 0}).sort("created_at", DESCENDING).limit(30))
+    return {"backups": backups}
+
+@app.post("/api/backups/restore")
+def restore_backup(backup_data: dict):
+    """Restore from backup JSON"""
+    try:
+        data = backup_data.get("data", {})
+        
+        restored_counts = {}
+        
+        # Restore products
+        if "products" in data and data["products"]:
+            products_col.delete_many({})
+            products_col.insert_many(data["products"])
+            restored_counts["products"] = len(data["products"])
+        
+        # Restore customers
+        if "customers" in data and data["customers"]:
+            customers_col.delete_many({})
+            customers_col.insert_many(data["customers"])
+            restored_counts["customers"] = len(data["customers"])
+        
+        # Restore suppliers
+        if "suppliers" in data and data["suppliers"]:
+            suppliers_col.delete_many({})
+            suppliers_col.insert_many(data["suppliers"])
+            restored_counts["suppliers"] = len(data["suppliers"])
+        
+        # Restore discount rules
+        if "discount_rules" in data and data["discount_rules"]:
+            discount_rules_col.delete_many({})
+            discount_rules_col.insert_many(data["discount_rules"])
+            restored_counts["discount_rules"] = len(data["discount_rules"])
+        
+        # Restore settings
+        if "settings" in data and data["settings"]:
+            settings_col.delete_many({})
+            settings_col.insert_one(data["settings"])
+            restored_counts["settings"] = 1
+        
+        return {
+            "message": "Backup restored successfully",
+            "restored": restored_counts
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Restore failed: {str(e)}")
+
 # ==================== SETTINGS ====================
 
 @app.get("/api/settings")
