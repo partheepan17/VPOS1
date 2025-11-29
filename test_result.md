@@ -217,6 +217,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✓ POS SYSTEM INTEGRATION TESTING COMPLETE - POS navigation working ✓, Barcode scanning interface functional ✓, Sample data loading operational ✓, Cart management working ✓, Price tier selection functional ✓, Customer selection working ✓, Payment processing interface operational ✓, Multi-language support in POS (Sinhala interface) ✓. All POS core functionality working correctly."
+      - working: true
+        agent: "testing"
+        comment: "✓ COMPREHENSIVE DISCOUNT RULE APPLICATION TESTING COMPLETE - Successfully tested all discount scenarios: 1) Rice product (5% discount for qty ≥10) ✓, 2) Sugar product (LKR 50/20% discount for qty ≥20) ✓, 3) General line item discount (2% for qty ≥5) ✓. Auto-apply functionality working correctly ✓. Discount rules properly configured (3 rules with auto-apply enabled) ✓. Cart totals calculating correctly with discounts ✓. Payment processing with discounted items working ✓. Invoice generation includes discount information ✓. All test scenarios from review request successfully validated."
 
   - task: "Global Language Selector"
     implemented: true
