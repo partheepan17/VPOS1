@@ -68,6 +68,9 @@ held_bills_col = db['held_bills']
 terminals_col = db['terminals']
 sync_queue_col = db['sync_queue']
 users_col = db['users']
+stock_movements_col = db['stock_movements']
+grn_records_col = db['grn_records']
+adjustment_requests_col = db['adjustment_requests']
 
 # Create indexes
 products_col.create_index([('sku', ASCENDING)], unique=True)
