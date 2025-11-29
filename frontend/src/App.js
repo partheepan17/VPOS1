@@ -1400,7 +1400,7 @@ function App() {
         )}
 
         {currentView === 'dashboard' && (
-          <Dashboard language={language} getText={getText} />
+          <Dashboard language={language} getText={getText} onNavigate={setCurrentView} />
         )}
 
         {currentView === 'products' && (
