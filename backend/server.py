@@ -200,7 +200,7 @@ class Payment(BaseModel):
 
 class Sale(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    invoice_number: str
+    invoice_number: Optional[str] = None
     customer_id: Optional[str] = None
     customer_name: str = ""
     price_tier: str = "retail"  # retail, wholesale, credit, other
