@@ -983,6 +983,17 @@ function App() {
                   {getText('settings')}
                 </button>
                 <button
+                  onClick={() => setCurrentView('devices')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'devices'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-devices"
+                >
+                  🖨️ Devices
+                </button>
+                <button
                   onClick={() => setCurrentView('terminals')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'terminals'
