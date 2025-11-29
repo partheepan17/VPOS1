@@ -1033,8 +1033,14 @@ function App() {
                     onChange={(e) => handleProductSearch(e.target.value)}
                     onFocus={() => productSearchTerm.length >= 2 && setShowSearchResults(true)}
                     onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && searchResults.length > 0) {
+                        // Add first search result to cart when Enter is pressed
+                        addProductFromSearch(searchResults[0]);
+                      }
+                    }}
                     className="w-full px-4 py-3 border-2 border-secondary-300 rounded-lg focus:outline-none focus:border-secondary-500 text-lg"
-                    placeholder="Search: Rice, SKU-001, or product ID..."
+                    placeholder="Search: Rice, SKU-001, or product ID... (Press Enter)"
                     data-testid="product-search-input"
                   />
                   
