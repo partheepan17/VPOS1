@@ -28,6 +28,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include refactored routes
+try:
+    from routes import backup_router, notification_router
+    app.include_router(backup_router)
+    app.include_router(notification_router)
+    print("✅ Refactored routes loaded successfully")
+except Exception as e:
+    print(f"⚠️  Failed to load refactored routes: {str(e)}")
+
 # MongoDB connection with connection pooling
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/')
 db_name = os.environ.get('DATABASE_NAME', 'pos_system')
