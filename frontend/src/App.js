@@ -983,36 +983,36 @@ function App() {
                 </button>
                 <button
                   onClick={() => setCurrentView('reports')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'reports'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-indigo-600 shadow-md nav-button-active'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg'
                   }`}
                   data-testid="nav-reports"
                 >
-                  {getText('reports')}
+                  📊 {getText('reports')}
                 </button>
                 <button
                   onClick={() => setCurrentView('analytics')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'analytics'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-purple-600 shadow-md nav-button-active'
+                      : 'bg-purple-600 text-white hover:bg-purple-700 hover:shadow-lg'
                   }`}
                   data-testid="nav-analytics"
                 >
-                  Analytics
+                  📈 Analytics
                 </button>
                 <button
                   onClick={() => setCurrentView('settings')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'settings'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-amber-600 shadow-md nav-button-active'
+                      : 'bg-amber-600 text-white hover:bg-amber-700 hover:shadow-lg'
                   }`}
                   data-testid="nav-settings"
                 >
-                  {getText('settings')}
+                  ⚙️ {getText('settings')}
                 </button>
                 <button
                   onClick={() => setCurrentView('devices')}
