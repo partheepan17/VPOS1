@@ -327,6 +327,113 @@ function App() {
     setCart([]);
     setSelectedCustomer(null);
     setBarcodeInput('');
+    setPayments([]);
+  };
+
+  const fetchHeldBills = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/held-bills`);
+      setHeldBills(response.data.bills || []);
+    } catch (error) {
+      console.error('Error fetching held bills:', error);
+    }
+  };
+
+  const holdBill = async () => {
+    if (cart.length === 0) {
+      showNotification('Cart is empty!', 'error');
+      return;
+    }
+
+    const { subtotal, totalDiscount, total } = calculateTotals();
+    
+    const heldBill = {
+      customer_id: selectedCustomer?.id || null,
+      customer_name: selectedCustomer?.name || 'Walk-in',
+      price_tier: selectedTier,
+      items: cart,
+      subtotal,
+      total_discount: totalDiscount,
+      total,
+      terminal_name: 'Terminal 1',
+      cashier_name: 'Cashier',
+      notes: ''
+    };
+
+    try {
+      await axios.post(`${API_URL}/api/held-bills`, heldBill);
+      showNotification('Bill held successfully!', 'success');
+      clearCart();
+      fetchHeldBills();
+    } catch (error) {
+      console.error('Error holding bill:', error);
+      showNotification('Failed to hold bill!', 'error');
+    }
+  };
+
+  const resumeBill = async (billId) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/held-bills/${billId}`);
+      const bill = response.data;
+      
+      setCart(bill.items);
+      setSelectedTier(bill.price_tier);
+      if (bill.customer_id) {
+        const customer = customers.find(c => c.id === bill.customer_id);
+        if (customer) setSelectedCustomer(customer);
+      }
+      
+      await axios.delete(`${API_URL}/api/held-bills/${billId}`);
+      fetchHeldBills();
+      setShowHeldBills(false);
+      showNotification('Bill resumed!', 'success');
+    } catch (error) {
+      console.error('Error resuming bill:', error);
+      showNotification('Failed to resume bill!', 'error');
+    }
+  };
+
+  const deleteHeldBill = async (billId) => {
+    if (!window.confirm('Delete this held bill?')) return;
+    
+    try {
+      await axios.delete(`${API_URL}/api/held-bills/${billId}`);
+      fetchHeldBills();
+      showNotification('Held bill deleted!', 'success');
+    } catch (error) {
+      console.error('Error deleting held bill:', error);
+      showNotification('Failed to delete bill!', 'error');
+    }
+  };
+
+  const addPayment = () => {
+    if (!paymentMethod || !paymentAmount || parseFloat(paymentAmount) <= 0) {
+      showNotification('Invalid payment details!', 'error');
+      return;
+    }
+
+    const newPayment = {
+      method: paymentMethod,
+      amount: parseFloat(paymentAmount),
+      reference: ''
+    };
+
+    setPayments([...payments, newPayment]);
+    setPaymentAmount('');
+    showNotification('Payment added!', 'success');
+  };
+
+  const removePayment = (index) => {
+    setPayments(payments.filter((_, i) => i !== index));
+  };
+
+  const getTotalPaid = () => {
+    return payments.reduce((sum, p) => sum + p.amount, 0);
+  };
+
+  const getRemainingAmount = () => {
+    const { total } = calculateTotals();
+    return total - getTotalPaid();
   };
 
   const calculateTotals = () => {
