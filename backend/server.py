@@ -285,6 +285,8 @@ def create_sale(sale: Sale):
                 })
     
     sales_col.insert_one(sale_dict)
+    # Remove MongoDB _id from response
+    sale_dict.pop('_id', None)
     return {"message": "Sale created", "sale": sale_dict}
 
 @app.put("/api/sales/{sale_id}")
