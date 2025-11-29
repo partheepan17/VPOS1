@@ -1161,6 +1161,97 @@ def bulk_update_prices(rule: Dict):
     
     return {"message": f"Updated {updated_count} products", "count": updated_count}
 
+# ==================== TERMINALS ====================
+
+class Terminal(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    ip_address: str = ""
+    status: str = "active"  # active, inactive, offline
+    last_sync: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+
+@app.get("/api/terminals")
+def get_terminals():
+    """Get all terminals"""
+    terminals = list(terminals_col.find({}, {"_id": 0}))
+    return {"terminals": terminals}
+
+@app.post("/api/terminals")
+def register_terminal(terminal: Terminal):
+    """Register a new terminal"""
+    # Check if name exists
+    existing = terminals_col.find_one({"name": terminal.name})
+    if existing:
+        raise HTTPException(status_code=400, detail="Terminal name already exists")
+    
+    terminal_dict = terminal.dict()
+    terminals_col.insert_one(terminal_dict)
+    terminal_dict.pop('_id', None)
+    return {"message": "Terminal registered", "terminal": terminal_dict}
+
+@app.put("/api/terminals/{terminal_id}")
+def update_terminal(terminal_id: str, terminal: Terminal):
+    """Update terminal info"""
+    terminal_dict = terminal.dict()
+    result = terminals_col.update_one({"id": terminal_id}, {"$set": terminal_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Terminal not found")
+    return {"message": "Terminal updated"}
+
+@app.post("/api/terminals/{terminal_id}/heartbeat")
+def terminal_heartbeat(terminal_id: str):
+    """Terminal heartbeat to update status"""
+    result = terminals_col.update_one(
+        {"id": terminal_id},
+        {"$set": {
+            "status": "active",
+            "last_sync": datetime.utcnow().isoformat()
+        }}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Terminal not found")
+    return {"message": "Heartbeat received"}
+
+@app.get("/api/sync/changes")
+def get_sync_changes(since: str = "", terminal_id: str = ""):
+    """Get changes since timestamp for syncing"""
+    query = {}
+    if since:
+        query["updated_at"] = {"$gt": since}
+    
+    changes = {
+        "products": list(products_col.find(query, {"_id": 0}).limit(100)),
+        "customers": list(customers_col.find(query, {"_id": 0}).limit(100)),
+        "sales": list(sales_col.find({"created_at": {"$gt": since}} if since else {}, {"_id": 0}).limit(50)),
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    return changes
+
+@app.get("/api/sync/status")
+def get_sync_status():
+    """Get sync status of all terminals"""
+    terminals = list(terminals_col.find({}, {"_id": 0}))
+    
+    # Check for offline terminals (no heartbeat in last 5 minutes)
+    current_time = datetime.utcnow()
+    for terminal in terminals:
+        last_sync = datetime.fromisoformat(terminal.get("last_sync", terminal.get("created_at")))
+        time_diff = (current_time - last_sync).total_seconds()
+        
+        if time_diff > 300:  # 5 minutes
+            terminal["status"] = "offline"
+        elif time_diff > 60:  # 1 minute
+            terminal["status"] = "warning"
+    
+    return {
+        "terminals": terminals,
+        "total": len(terminals),
+        "active": len([t for t in terminals if t["status"] == "active"]),
+        "offline": len([t for t in terminals if t["status"] == "offline"])
+    }
+
 # ==================== SEED DATA ====================
 
 @app.post("/api/seed-data")
