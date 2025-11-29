@@ -1013,6 +1013,10 @@ function App() {
           </div>
         )}
 
+        {currentView === 'dashboard' && (
+          <Dashboard language={language} getText={getText} />
+        )}
+
         {currentView === 'products' && (
           <ProductsManagement language={language} getText={getText} />
         )}
