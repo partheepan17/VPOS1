@@ -454,7 +454,7 @@ def update_product(product_id: str, product: Product):
 
 @app.delete("/api/products/{product_id}")
 def delete_product(product_id: str):
-    # Soft delete
+    # Soft delete - find product regardless of active status
     result = products_col.update_one({"id": product_id}, {"$set": {"active": False}})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
