@@ -1,10 +1,13 @@
-from fastapi import FastAPI, HTTPException, Query, UploadFile, File
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 from datetime import datetime, timedelta
+from passlib.context import CryptContext
+from jose import JWTError, jwt
 import os
 from dotenv import load_dotenv
 import uuid
