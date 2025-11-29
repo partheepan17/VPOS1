@@ -289,14 +289,26 @@ function InvoicePrint({ language, getText }) {
                 </tr>
               </thead>
               <tbody>
-                {selectedSale.items.map((item, index) => (
-                  <tr key={index} className="border-b border-gray-300">
-                    <td className="py-2">{item.name}</td>
-                    <td className="text-center">{item.quantity}</td>
-                    <td className="text-right">{item.unit_price.toFixed(2)}</td>
-                    <td className="text-right font-semibold">{item.total.toFixed(2)}</td>
-                  </tr>
-                ))}
+                {selectedSale.items.map((item, index) => {
+                  // Get product name in selected language
+                  let productName = item.name;
+                  if (invoiceLanguage === 'si' && item.name_si) {
+                    productName = item.name_si;
+                  } else if (invoiceLanguage === 'ta' && item.name_ta) {
+                    productName = item.name_ta;
+                  } else if (item.name_en) {
+                    productName = item.name_en;
+                  }
+                  
+                  return (
+                    <tr key={index} className="border-b border-gray-300">
+                      <td className="py-2">{productName}</td>
+                      <td className="text-center">{item.quantity}</td>
+                      <td className="text-right">{item.unit_price.toFixed(2)}</td>
+                      <td className="text-right font-semibold">{item.total.toFixed(2)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
 
