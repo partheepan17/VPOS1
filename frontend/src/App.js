@@ -985,6 +985,10 @@ function App() {
           <ReportsManagement language={language} getText={getText} />
         )}
 
+        {currentView === 'settings' && (
+          <SettingsManagement language={language} getText={getText} />
+        )}
+
         {currentView === 'sales' && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">{getText('salesHistory')}</h2>
