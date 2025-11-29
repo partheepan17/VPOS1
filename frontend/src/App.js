@@ -543,6 +543,28 @@ function App() {
                 >
                   CSV
                 </button>
+                <button
+                  onClick={() => setCurrentView('inventory')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'inventory'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-inventory"
+                >
+                  Inventory
+                </button>
+                <button
+                  onClick={() => setCurrentView('reports')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'reports'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-reports"
+                >
+                  Reports
+                </button>
               </nav>
             </div>
           </div>
