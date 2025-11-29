@@ -765,7 +765,7 @@ function App() {
                   }`}
                   data-testid="nav-reports"
                 >
-                  Reports
+                  {getText('reports')}
                 </button>
                 <button
                   onClick={() => setCurrentView('settings')}
@@ -776,7 +776,7 @@ function App() {
                   }`}
                   data-testid="nav-settings"
                 >
-                  Settings
+                  {getText('settings')}
                 </button>
                 <button
                   onClick={() => setCurrentView('terminals')}
@@ -787,7 +787,7 @@ function App() {
                   }`}
                   data-testid="nav-terminals"
                 >
-                  Terminals
+                  {getText('terminals')}
                 </button>
               </nav>
             </div>
