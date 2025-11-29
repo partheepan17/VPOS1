@@ -664,6 +664,174 @@ def apply_discount_rules(cart_items: List[Dict], price_tier: str = "retail"):
     
     return {"items": cart_items}
 
+# ==================== ADVANCED REPORTS ====================
+
+@app.get("/api/reports/sales-trends")
+def get_sales_trends(period: str = "daily", days: int = 30):
+    """Get sales trends over time (daily, weekly, monthly)"""
+    from datetime import datetime, timedelta
+    
+    end_date = datetime.utcnow()
+    start_date = end_date - timedelta(days=days)
+    
+    sales = list(sales_col.find({
+        "status": "completed",
+        "created_at": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}))
+    
+    # Group by period
+    trends = {}
+    for sale in sales:
+        sale_date = datetime.fromisoformat(sale["created_at"])
+        
+        if period == "daily":
+            key = sale_date.strftime("%Y-%m-%d")
+        elif period == "weekly":
+            key = sale_date.strftime("%Y-W%U")
+        else:  # monthly
+            key = sale_date.strftime("%Y-%m")
+        
+        if key not in trends:
+            trends[key] = {"date": key, "revenue": 0, "count": 0, "items": 0}
+        
+        trends[key]["revenue"] += sale.get("total", 0)
+        trends[key]["count"] += 1
+        trends[key]["items"] += len(sale.get("items", []))
+    
+    return {"trends": sorted(trends.values(), key=lambda x: x["date"])}
+
+@app.get("/api/reports/top-products")
+def get_top_products(limit: int = 10, days: int = 30):
+    """Get top selling products"""
+    from datetime import datetime, timedelta
+    
+    end_date = datetime.utcnow()
+    start_date = end_date - timedelta(days=days)
+    
+    sales = list(sales_col.find({
+        "status": "completed",
+        "created_at": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}))
+    
+    product_stats = {}
+    for sale in sales:
+        for item in sale.get("items", []):
+            product_id = item.get("product_id", "")
+            if product_id not in product_stats:
+                product_stats[product_id] = {
+                    "product_id": product_id,
+                    "name": item.get("name", ""),
+                    "quantity_sold": 0,
+                    "revenue": 0,
+                    "times_sold": 0
+                }
+            product_stats[product_id]["quantity_sold"] += item.get("quantity", 0)
+            product_stats[product_id]["revenue"] += item.get("total", 0)
+            product_stats[product_id]["times_sold"] += 1
+    
+    top_products = sorted(product_stats.values(), key=lambda x: x["revenue"], reverse=True)[:limit]
+    
+    return {"products": top_products}
+
+@app.get("/api/reports/sales-by-cashier")
+def get_sales_by_cashier(days: int = 30):
+    """Get sales performance by cashier"""
+    from datetime import datetime, timedelta
+    
+    end_date = datetime.utcnow()
+    start_date = end_date - timedelta(days=days)
+    
+    sales = list(sales_col.find({
+        "status": "completed",
+        "created_at": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}))
+    
+    cashier_stats = {}
+    for sale in sales:
+        cashier = sale.get("cashier_name", "Unknown")
+        if cashier not in cashier_stats:
+            cashier_stats[cashier] = {
+                "cashier": cashier,
+                "sales_count": 0,
+                "revenue": 0,
+                "avg_sale": 0
+            }
+        cashier_stats[cashier]["sales_count"] += 1
+        cashier_stats[cashier]["revenue"] += sale.get("total", 0)
+    
+    # Calculate averages
+    for stats in cashier_stats.values():
+        if stats["sales_count"] > 0:
+            stats["avg_sale"] = stats["revenue"] / stats["sales_count"]
+    
+    return {"cashiers": list(cashier_stats.values())}
+
+@app.get("/api/reports/profit-analysis")
+def get_profit_analysis(days: int = 30):
+    """Analyze profit margins (simplified - assumes cost is 70% of retail price)"""
+    from datetime import datetime, timedelta
+    
+    end_date = datetime.utcnow()
+    start_date = end_date - timedelta(days=days)
+    
+    sales = list(sales_col.find({
+        "status": "completed",
+        "created_at": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}))
+    
+    total_revenue = sum(sale.get("total", 0) for sale in sales)
+    estimated_cost = total_revenue * 0.70  # Simplified assumption
+    estimated_profit = total_revenue - estimated_cost
+    profit_margin = (estimated_profit / total_revenue * 100) if total_revenue > 0 else 0
+    
+    return {
+        "total_revenue": total_revenue,
+        "estimated_cost": estimated_cost,
+        "estimated_profit": estimated_profit,
+        "profit_margin": profit_margin,
+        "sales_count": len(sales),
+        "note": "Cost is estimated at 70% of retail price"
+    }
+
+@app.get("/api/reports/customer-insights")
+def get_customer_insights(days: int = 30):
+    """Get customer purchase insights"""
+    from datetime import datetime, timedelta
+    
+    end_date = datetime.utcnow()
+    start_date = end_date - timedelta(days=days)
+    
+    sales = list(sales_col.find({
+        "status": "completed",
+        "created_at": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}))
+    
+    customer_stats = {}
+    for sale in sales:
+        customer_id = sale.get("customer_id")
+        customer_name = sale.get("customer_name", "Walk-in")
+        
+        key = customer_id if customer_id else customer_name
+        if key not in customer_stats:
+            customer_stats[key] = {
+                "customer_name": customer_name,
+                "purchase_count": 0,
+                "total_spent": 0,
+                "avg_purchase": 0
+            }
+        
+        customer_stats[key]["purchase_count"] += 1
+        customer_stats[key]["total_spent"] += sale.get("total", 0)
+    
+    # Calculate averages and sort
+    for stats in customer_stats.values():
+        if stats["purchase_count"] > 0:
+            stats["avg_purchase"] = stats["total_spent"] / stats["purchase_count"]
+    
+    top_customers = sorted(customer_stats.values(), key=lambda x: x["total_spent"], reverse=True)[:20]
+    
+    return {"customers": top_customers}
+
 # ==================== INVENTORY ====================
 
 @app.post("/api/inventory/receive")
