@@ -561,6 +561,236 @@ def update_settings(settings: dict):
     settings_col.insert_one(settings)
     return {"message": "Settings updated", "settings": settings}
 
+# ==================== CSV IMPORT/EXPORT ====================
+
+@app.get("/api/export/products")
+def export_products_csv():
+    products = list(products_col.find({"active": True}, {"_id": 0}))
+    csv_content = csv_utils.products_to_csv(products)
+    
+    return StreamingResponse(
+        io.StringIO(csv_content),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=products_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+@app.post("/api/import/products/validate")
+async def validate_products_csv(file: UploadFile = File(...)):
+    content = await file.read()
+    csv_data = csv_utils.parse_csv_content(content.decode('utf-8'))
+    
+    is_valid, errors, valid_rows = csv_utils.validate_product_csv(csv_data)
+    
+    return {
+        "valid": is_valid,
+        "errors": errors,
+        "valid_count": len(valid_rows),
+        "total_count": len(csv_data),
+        "preview": valid_rows[:10]  # Show first 10 valid rows
+    }
+
+@app.post("/api/import/products")
+async def import_products_csv(file: UploadFile = File(...)):
+    content = await file.read()
+    csv_data = csv_utils.parse_csv_content(content.decode('utf-8'))
+    
+    is_valid, errors, valid_rows = csv_utils.validate_product_csv(csv_data)
+    
+    if not is_valid:
+        raise HTTPException(status_code=400, detail={"errors": errors})
+    
+    imported = 0
+    updated = 0
+    
+    for row in valid_rows:
+        # Check if product exists by SKU
+        existing = products_col.find_one({"sku": row['sku']})
+        
+        product_data = {
+            "sku": row['sku'],
+            "barcodes": row.get('barcodes', '').split(',') if row.get('barcodes') else [],
+            "name_en": row['name_en'],
+            "name_si": row.get('name_si', ''),
+            "name_ta": row.get('name_ta', ''),
+            "unit": row.get('unit', 'pcs'),
+            "category": row.get('category', ''),
+            "tax_code": row.get('tax_code', ''),
+            "supplier_id": row.get('supplier_id', ''),
+            "price_retail": float(row.get('price_retail', 0)),
+            "price_wholesale": float(row.get('price_wholesale', 0)),
+            "price_credit": float(row.get('price_credit', 0)),
+            "price_other": float(row.get('price_other', 0)),
+            "stock": float(row.get('stock', 0)),
+            "reorder_level": float(row.get('reorder_level', 0)),
+            "weight_based": row.get('weight_based', '').lower() in ['true', '1', 'yes'],
+            "active": row.get('active', '').lower() not in ['false', '0', 'no'],
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        if existing:
+            product_data['id'] = existing['id']
+            products_col.update_one({"sku": row['sku']}, {"$set": product_data})
+            updated += 1
+        else:
+            product_data['id'] = str(uuid.uuid4())
+            product_data['created_at'] = datetime.utcnow().isoformat()
+            products_col.insert_one(product_data)
+            imported += 1
+    
+    return {"message": "Import successful", "imported": imported, "updated": updated}
+
+@app.get("/api/export/customers")
+def export_customers_csv():
+    customers = list(customers_col.find({"active": True}, {"_id": 0}))
+    csv_content = csv_utils.customers_to_csv(customers)
+    
+    return StreamingResponse(
+        io.StringIO(csv_content),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=customers_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+@app.post("/api/import/customers")
+async def import_customers_csv(file: UploadFile = File(...)):
+    content = await file.read()
+    csv_data = csv_utils.parse_csv_content(content.decode('utf-8'))
+    
+    is_valid, errors, valid_rows = csv_utils.validate_customer_csv(csv_data)
+    
+    if not is_valid:
+        raise HTTPException(status_code=400, detail={"errors": errors})
+    
+    imported = 0
+    
+    for row in valid_rows:
+        customer_data = {
+            "id": str(uuid.uuid4()),
+            "name": row['name'],
+            "phone": row.get('phone', ''),
+            "email": row.get('email', ''),
+            "category": row.get('category', 'retail'),
+            "default_tier": row.get('default_tier', 'retail'),
+            "address": row.get('address', ''),
+            "tax_id": row.get('tax_id', ''),
+            "notes": row.get('notes', ''),
+            "active": row.get('active', '').lower() not in ['false', '0', 'no'],
+            "created_at": datetime.utcnow().isoformat()
+        }
+        customers_col.insert_one(customer_data)
+        imported += 1
+    
+    return {"message": "Import successful", "imported": imported}
+
+@app.get("/api/export/suppliers")
+def export_suppliers_csv():
+    suppliers = list(suppliers_col.find({"active": True}, {"_id": 0}))
+    csv_content = csv_utils.suppliers_to_csv(suppliers)
+    
+    return StreamingResponse(
+        io.StringIO(csv_content),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=suppliers_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+@app.post("/api/import/suppliers")
+async def import_suppliers_csv(file: UploadFile = File(...)):
+    content = await file.read()
+    csv_data = csv_utils.parse_csv_content(content.decode('utf-8'))
+    
+    is_valid, errors, valid_rows = csv_utils.validate_supplier_csv(csv_data)
+    
+    if not is_valid:
+        raise HTTPException(status_code=400, detail={"errors": errors})
+    
+    imported = 0
+    
+    for row in valid_rows:
+        supplier_data = {
+            "id": str(uuid.uuid4()),
+            "name": row['name'],
+            "phone": row.get('phone', ''),
+            "email": row.get('email', ''),
+            "address": row.get('address', ''),
+            "tax_id": row.get('tax_id', ''),
+            "notes": row.get('notes', ''),
+            "active": row.get('active', '').lower() not in ['false', '0', 'no'],
+            "created_at": datetime.utcnow().isoformat()
+        }
+        suppliers_col.insert_one(supplier_data)
+        imported += 1
+    
+    return {"message": "Import successful", "imported": imported}
+
+@app.get("/api/export/discount-rules")
+def export_discount_rules_csv():
+    rules = list(discount_rules_col.find({"active": True}, {"_id": 0}))
+    csv_content = csv_utils.discount_rules_to_csv(rules)
+    
+    return StreamingResponse(
+        io.StringIO(csv_content),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=discount_rules_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+@app.get("/api/export/sales")
+def export_sales_csv(start_date: str = "", end_date: str = ""):
+    query = {"status": "completed"}
+    if start_date:
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        if "created_at" not in query:
+            query["created_at"] = {}
+        query["created_at"]["$lte"] = end_date
+    
+    sales = list(sales_col.find(query, {"_id": 0}))
+    csv_content = csv_utils.sales_to_csv(sales)
+    
+    return StreamingResponse(
+        io.StringIO(csv_content),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=sales_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+@app.post("/api/prices/bulk-update")
+def bulk_update_prices(rule: Dict):
+    """
+    Apply bulk price update rule
+    rule format: {
+        "tier": "wholesale",  # which tier to update
+        "formula": "retail_minus_percent",  # or "retail_minus_fixed", "retail_multiply"
+        "value": 5  # percentage, fixed amount, or multiplier
+    }
+    """
+    tier = rule.get('tier', 'wholesale')
+    formula = rule.get('formula', 'retail_minus_percent')
+    value = float(rule.get('value', 0))
+    
+    products = list(products_col.find({"active": True}))
+    updated_count = 0
+    
+    for product in products:
+        retail_price = product.get('price_retail', 0)
+        new_price = retail_price
+        
+        if formula == 'retail_minus_percent':
+            new_price = retail_price * (1 - value / 100)
+        elif formula == 'retail_minus_fixed':
+            new_price = retail_price - value
+        elif formula == 'retail_multiply':
+            new_price = retail_price * value
+        
+        # Ensure price doesn't go negative
+        new_price = max(0, new_price)
+        
+        # Update the tier price
+        products_col.update_one(
+            {"id": product['id']},
+            {"$set": {f"price_{tier}": new_price, "updated_at": datetime.utcnow().isoformat()}}
+        )
+        updated_count += 1
+    
+    return {"message": f"Updated {updated_count} products", "count": updated_count}
+
 # ==================== SEED DATA ====================
 
 @app.post("/api/seed-data")
