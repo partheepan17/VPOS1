@@ -632,8 +632,11 @@ def apply_discount_rules(cart_items: List[Dict], price_tier: str = "retail"):
         
         for rule in rules:
             # Check if rule applies to this item
-            if rule['rule_type'] == 'product' and rule.get('target_id') == item.get('product_id'):
-                applicable_rules.append(rule)
+            if rule['rule_type'] == 'product':
+                # Check both product_id (UUID) and sku for product-specific rules
+                target = rule.get('target_id', '')
+                if target == item.get('product_id') or target == item.get('sku'):
+                    applicable_rules.append(rule)
             elif rule['rule_type'] == 'category':
                 # Use category from cart item instead of fetching from DB
                 if item.get('category') and item.get('category') == rule.get('target_id'):
