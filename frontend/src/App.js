@@ -633,6 +633,17 @@ function App() {
               {/* Navigation */}
               <nav className="flex gap-2 flex-wrap">
                 <button
+                  onClick={() => setCurrentView('dashboard')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'dashboard'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-dashboard"
+                >
+                  Dashboard
+                </button>
+                <button
                   onClick={() => setCurrentView('pos')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'pos'
