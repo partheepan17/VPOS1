@@ -209,6 +209,7 @@ def create_product(product: Product):
     
     product_dict = product.dict()
     products_col.insert_one(product_dict)
+    product_dict.pop('_id', None)
     return {"message": "Product created", "product": product_dict}
 
 @app.put("/api/products/{product_id}")
