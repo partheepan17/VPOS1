@@ -704,7 +704,15 @@ function App() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      // Don't trigger shortcuts when typing in input fields
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        // Allow Ctrl+P even in input fields for printing
+        if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+          e.preventDefault();
+          handlePrintLastInvoice();
+        }
+        return;
+      }
       
       // F2 - Pay
       if (e.key === 'F2') {
@@ -732,11 +740,16 @@ function App() {
         fetchHeldBills();
         setShowHeldBills(true);
       }
+      // Ctrl+P - Print Last Invoice
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        handlePrintLastInvoice();
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cart, selectedCustomer, selectedTier]);
+  }, [cart, selectedCustomer, selectedTier, salesHistory]);
 
   const { subtotal, totalDiscount, total } = calculateTotals();
 
