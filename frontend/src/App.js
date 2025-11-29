@@ -699,7 +699,7 @@ function App() {
                   }`}
                   data-testid="nav-discounts"
                 >
-                  Discounts
+                  {getText('discounts')}
                 </button>
                 <button
                   onClick={() => setCurrentView('prices')}
@@ -710,7 +710,7 @@ function App() {
                   }`}
                   data-testid="nav-prices"
                 >
-                  Prices
+                  {getText('prices')}
                 </button>
                 <button
                   onClick={() => setCurrentView('csv')}
@@ -721,7 +721,7 @@ function App() {
                   }`}
                   data-testid="nav-csv"
                 >
-                  CSV
+                  {getText('csv')}
                 </button>
                 <button
                   onClick={() => setCurrentView('labels')}
@@ -732,7 +732,7 @@ function App() {
                   }`}
                   data-testid="nav-labels"
                 >
-                  Labels
+                  {getText('labels')}
                 </button>
                 <button
                   onClick={() => setCurrentView('inventory')}
@@ -743,7 +743,7 @@ function App() {
                   }`}
                   data-testid="nav-inventory"
                 >
-                  Inventory
+                  {getText('inventory')}
                 </button>
                 <button
                   onClick={() => setCurrentView('invoices')}
@@ -754,7 +754,7 @@ function App() {
                   }`}
                   data-testid="nav-invoices"
                 >
-                  Invoices
+                  {getText('invoices')}
                 </button>
                 <button
                   onClick={() => setCurrentView('reports')}
