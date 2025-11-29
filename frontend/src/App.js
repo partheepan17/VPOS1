@@ -644,7 +644,7 @@ function App() {
                   }`}
                   data-testid="nav-dashboard"
                 >
-                  Dashboard
+                  {getText('dashboard')}
                 </button>
                 <button
                   onClick={() => setCurrentView('pos')}
@@ -666,7 +666,7 @@ function App() {
                   }`}
                   data-testid="nav-sales"
                 >
-                  Sales
+                  {getText('sales')}
                 </button>
                 <button
                   onClick={() => setCurrentView('products')}
@@ -677,7 +677,7 @@ function App() {
                   }`}
                   data-testid="nav-products"
                 >
-                  Products
+                  {getText('products')}
                 </button>
                 <button
                   onClick={() => setCurrentView('customers')}
@@ -688,7 +688,7 @@ function App() {
                   }`}
                   data-testid="nav-customers"
                 >
-                  Customers
+                  {getText('customers')}
                 </button>
                 <button
                   onClick={() => setCurrentView('discounts')}
