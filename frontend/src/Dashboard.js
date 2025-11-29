@@ -23,10 +23,18 @@ function Dashboard({ language, getText }) {
       setLoading(true);
       
       const [productsRes, customersRes, lowStockRes, salesRes] = await Promise.all([
-        axios.get(`${API_URL}/api/products?limit=1000`),
-        axios.get(`${API_URL}/api/customers?limit=1000`),
-        axios.get(`${API_URL}/api/inventory/low-stock`),
-        axios.get(`${API_URL}/api/sales?limit=10`)
+        axios.get(`${API_URL}/api/products?limit=1000`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        }),
+        axios.get(`${API_URL}/api/customers?limit=1000`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        }),
+        axios.get(`${API_URL}/api/products/low-stock`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        }),
+        axios.get(`${API_URL}/api/sales?limit=10`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        })
       ]);
 
       const today = new Date().toISOString().split('T')[0];
