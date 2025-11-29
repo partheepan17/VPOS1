@@ -204,32 +204,40 @@ function Dashboard({ language, getText, onNavigate }) {
       </div>
 
       {/* Quick Links */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="bg-gradient-to-r from-white to-gray-50 rounded-xl shadow-lg p-8">
+        <h3 className="text-2xl font-bold text-gray-800 mb-6">⚡ Quick Actions</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <button
-            onClick={() => window.location.href = '#'}
-            className="px-4 py-3 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-lg font-medium transition text-center"
+            onClick={() => onNavigate && onNavigate('products')}
+            className="quick-action-card p-6 bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 text-center"
           >
-            View Products
+            <div className="text-4xl mb-3">📦</div>
+            <div className="font-bold text-lg">View Products</div>
+            <div className="text-sm opacity-90 mt-1">Manage inventory</div>
           </button>
           <button
-            onClick={() => window.location.href = '#'}
-            className="px-4 py-3 bg-secondary-50 hover:bg-secondary-100 text-secondary-700 rounded-lg font-medium transition text-center"
+            onClick={() => onNavigate && onNavigate('stock-entry')}
+            className="quick-action-card p-6 bg-gradient-to-br from-green-400 to-green-600 text-white rounded-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 text-center"
           >
-            Inventory
+            <div className="text-4xl mb-3">📊</div>
+            <div className="font-bold text-lg">Stock Entry</div>
+            <div className="text-sm opacity-90 mt-1">Add new stock</div>
           </button>
           <button
-            onClick={() => window.location.href = '#'}
-            className="px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg font-medium transition text-center"
+            onClick={() => onNavigate && onNavigate('reports')}
+            className="quick-action-card p-6 bg-gradient-to-br from-indigo-400 to-indigo-600 text-white rounded-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 text-center"
           >
-            Reports
+            <div className="text-4xl mb-3">📈</div>
+            <div className="font-bold text-lg">Reports</div>
+            <div className="text-sm opacity-90 mt-1">View analytics</div>
           </button>
           <button
-            onClick={() => window.location.href = '#'}
-            className="px-4 py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg font-medium transition text-center"
+            onClick={() => onNavigate && onNavigate('settings')}
+            className="quick-action-card p-6 bg-gradient-to-br from-amber-400 to-amber-600 text-white rounded-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 text-center"
           >
-            Settings
+            <div className="text-4xl mb-3">⚙️</div>
+            <div className="font-bold text-lg">Settings</div>
+            <div className="text-sm opacity-90 mt-1">System config</div>
           </button>
         </div>
       </div>
