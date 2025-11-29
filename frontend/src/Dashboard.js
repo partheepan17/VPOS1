@@ -81,64 +81,69 @@ function Dashboard({ language, getText }) {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-br from-primary-50 to-primary-100 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer interactive-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Today's Sales</p>
-              <p className="text-3xl font-bold text-primary-600">{stats.todaySales}</p>
+              <p className="text-primary-600 text-sm font-semibold uppercase tracking-wide">Today's Sales</p>
+              <p className="text-4xl font-bold text-primary-900 mt-2">{stats.todaySales}</p>
             </div>
-            <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-primary-500 p-4 rounded-2xl shadow-md">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">Invoices: {stats.todaySales}</p>
+          <p className="text-xs text-primary-700 mt-2 font-medium">Invoices: {stats.todaySales}</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-br from-secondary-50 to-secondary-100 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer interactive-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Today's Revenue</p>
-              <p className="text-3xl font-bold text-secondary-600">LKR {stats.todayRevenue.toFixed(2)}</p>
+              <p className="text-secondary-600 text-sm font-semibold uppercase tracking-wide">Today's Revenue</p>
+              <p className="text-4xl font-bold text-secondary-900 mt-2">LKR {stats.todayRevenue.toFixed(2)}</p>
             </div>
-            <div className="w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-secondary-500 p-4 rounded-2xl shadow-md">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">Completed sales only</p>
+          <p className="text-xs text-secondary-700 mt-2 font-medium">Completed sales only</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer interactive-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Products</p>
-              <p className="text-3xl font-bold text-blue-600">{stats.totalProducts}</p>
+              <p className="text-blue-600 text-sm font-semibold uppercase tracking-wide">Total Products</p>
+              <p className="text-4xl font-bold text-blue-900 mt-2">{stats.totalProducts}</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-blue-500 p-4 rounded-2xl shadow-md">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">In inventory</p>
+          <p className="text-xs text-blue-700 mt-2 font-medium">In inventory</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer interactive-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Low Stock Items</p>
-              <p className="text-3xl font-bold text-red-600">{stats.lowStockProducts}</p>
+              <p className="text-red-600 text-sm font-semibold uppercase tracking-wide">Low Stock Items</p>
+              <p className="text-4xl font-bold text-red-900 mt-2">{stats.lowStockProducts}</p>
+              {stats.lowStockProducts > 0 && (
+                <span className="inline-block mt-2 px-2 py-1 bg-red-200 text-red-800 text-xs font-bold rounded">
+                  ⚠️ Action Required
+                </span>
+              )}
             </div>
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-red-500 p-4 rounded-2xl shadow-md">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">Need reordering</p>
+          <p className="text-xs text-red-700 mt-2 font-medium">Need reordering</p>
         </div>
       </div>
 
