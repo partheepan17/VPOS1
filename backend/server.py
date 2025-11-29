@@ -86,6 +86,8 @@ class Product(BaseModel):
     stock: float = 0.0
     reorder_level: float = 0.0
     weight_based: bool = False
+    packed_date: str = ""
+    expire_date: str = ""
     active: bool = True
     created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
