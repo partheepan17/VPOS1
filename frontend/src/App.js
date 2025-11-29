@@ -1049,6 +1049,10 @@ function App() {
           <CSVManagement language={language} getText={getText} />
         )}
 
+        {currentView === 'labels' && (
+          <LabelPrinting language={language} getText={getText} />
+        )}
+
         {currentView === 'inventory' && (
           <InventoryManagement language={language} getText={getText} />
         )}
