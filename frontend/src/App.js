@@ -1308,4 +1308,90 @@ function App() {
   );
 }
 
+      {/* Held Bills Modal */}
+      {showHeldBills && (
+        <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto fade-in">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Held Bills</h2>
+
+            {heldBills.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                <p className="text-lg">No held bills</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {heldBills.map(bill => (
+                  <div key={bill.id} className="border border-gray-300 rounded-lg p-4 hover:bg-gray-50">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <div className="font-semibold text-gray-800">
+                          {bill.customer_name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(bill.created_at).toLocaleString()}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {bill.items.length} items • {bill.price_tier}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-primary-600">
+                          LKR {bill.total.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {bill.terminal_name}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border-t border-gray-200 pt-3 mb-3">
+                      <div className="text-sm text-gray-600 space-y-1">
+                        {bill.items.slice(0, 3).map((item, index) => (
+                          <div key={index} className="flex justify-between">
+                            <span>{item.name} × {item.quantity}</span>
+                            <span className="font-medium">LKR {item.total.toFixed(2)}</span>
+                          </div>
+                        ))}
+                        {bill.items.length > 3 && (
+                          <div className="text-xs text-gray-400">
+                            ... and {bill.items.length - 3} more items
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => resumeBill(bill.id)}
+                        className="flex-1 px-4 py-2 bg-secondary-500 hover:bg-secondary-600 text-white rounded-lg font-medium transition"
+                      >
+                        Resume
+                      </button>
+                      <button
+                        onClick={() => deleteHeldBill(bill.id)}
+                        className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-6">
+              <button
+                onClick={() => setShowHeldBills(false)}
+                className="w-full px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg font-medium transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default App;
