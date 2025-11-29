@@ -1862,41 +1862,240 @@ def seed_sample_data():
             "active": True,
             "created_at": datetime.utcnow().isoformat(),
             "updated_at": datetime.utcnow().isoformat()
+        },
+        # Additional products for better demo
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "BREAD-001",
+            "barcodes": ["8901234567899"],
+            "name_en": "Bread Loaf",
+            "name_si": "පාන්",
+            "name_ta": "ரொட்டி",
+            "unit": "loaf",
+            "category": "Bakery",
+            "supplier_id": "sup-003",
+            "price_retail": 110.00,
+            "price_wholesale": 100.00,
+            "price_credit": 105.00,
+            "price_other": 95.00,
+            "stock": 50,
+            "reorder_level": 10,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "SALT-001",
+            "barcodes": ["8901234567900"],
+            "name_en": "Table Salt 1kg",
+            "name_si": "ලුණු 1kg",
+            "name_ta": "உப்பு 1kg",
+            "unit": "kg",
+            "category": "Spices",
+            "supplier_id": "sup-001",
+            "price_retail": 80.00,
+            "price_wholesale": 75.00,
+            "price_credit": 77.00,
+            "price_other": 70.00,
+            "stock": 150,
+            "reorder_level": 40,
+            "weight_based": True,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "CHILLI-001",
+            "barcodes": ["8901234567901"],
+            "name_en": "Chilli Powder 100g",
+            "name_si": "මිරිස් කුඩු 100g",
+            "name_ta": "மிளகாய் பொடி 100g",
+            "unit": "pack",
+            "category": "Spices",
+            "supplier_id": "sup-002",
+            "price_retail": 320.00,
+            "price_wholesale": 300.00,
+            "price_credit": 310.00,
+            "price_other": 290.00,
+            "stock": 70,
+            "reorder_level": 20,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "BISCUIT-001",
+            "barcodes": ["8901234567902"],
+            "name_en": "Cream Biscuits 200g",
+            "name_si": "ක්‍රීම් බිස්කට් 200g",
+            "name_ta": "கிரீம் பிஸ்கட் 200g",
+            "unit": "pack",
+            "category": "Snacks",
+            "supplier_id": "sup-003",
+            "price_retail": 180.00,
+            "price_wholesale": 165.00,
+            "price_credit": 172.00,
+            "price_other": 160.00,
+            "stock": 90,
+            "reorder_level": 30,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "NOODLES-001",
+            "barcodes": ["8901234567903"],
+            "name_en": "Instant Noodles 400g",
+            "name_si": "ඉක්මන් නූඩ්ල්ස් 400g",
+            "name_ta": "உடனடி நூடுல்ஸ் 400g",
+            "unit": "pack",
+            "category": "Groceries",
+            "supplier_id": "sup-001",
+            "price_retail": 290.00,
+            "price_wholesale": 270.00,
+            "price_credit": 280.00,
+            "price_other": 260.00,
+            "stock": 110,
+            "reorder_level": 35,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "sku": "TOOTHPASTE-001",
+            "barcodes": ["8901234567904"],
+            "name_en": "Toothpaste 100ml",
+            "name_si": "දත් මැදි 100ml",
+            "name_ta": "பற்பசை 100ml",
+            "unit": "tube",
+            "category": "Personal Care",
+            "supplier_id": "sup-002",
+            "price_retail": 250.00,
+            "price_wholesale": 230.00,
+            "price_credit": 240.00,
+            "price_other": 220.00,
+            "stock": 75,
+            "reorder_level": 25,
+            "weight_based": False,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
         }
     ]
     products_col.insert_many(products)
     
-    # Sample customers
+    # Sample customers with more variety
     customers = [
         {
             "id": "cust-001",
             "name": "Walk-in Customer",
             "phone": "",
+            "email": "",
+            "address": "",
             "category": "retail",
             "default_tier": "retail",
             "active": True,
+            "notes": "Default cash customer",
             "created_at": datetime.utcnow().isoformat()
         },
         {
-            "id": "cust-002",
+            "id": str(uuid.uuid4()),
             "name": "Nimal Perera",
             "phone": "0771234567",
+            "email": "nimal@email.com",
+            "address": "45, Temple Road, Colombo 06",
             "category": "retail",
             "default_tier": "retail",
             "active": True,
+            "notes": "Regular customer",
             "created_at": datetime.utcnow().isoformat()
         },
         {
-            "id": "cust-003",
+            "id": str(uuid.uuid4()),
             "name": "Kamal's Store",
             "phone": "0772345678",
+            "email": "kamalstore@email.com",
+            "address": "12/A, Main Street, Kandy",
             "category": "wholesale",
             "default_tier": "wholesale",
             "active": True,
+            "notes": "Wholesale buyer - monthly billing",
+            "created_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "name": "Priyanka Silva",
+            "phone": "0773456789",
+            "email": "priyanka@email.com",
+            "address": "78, Sea View Lane, Galle",
+            "category": "retail",
+            "default_tier": "credit",
+            "active": True,
+            "notes": "Credit customer - 30 days",
+            "created_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "name": "Ravi's Supermarket",
+            "phone": "0774567890",
+            "email": "ravissuper@email.com",
+            "address": "23, Market Road, Matara",
+            "category": "wholesale",
+            "default_tier": "wholesale",
+            "active": True,
+            "notes": "Bulk buyer - weekly orders",
+            "created_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "name": "Sunil Fernando",
+            "phone": "0775678901",
+            "email": "sunil@email.com",
+            "address": "56, Park Avenue, Negombo",
+            "category": "retail",
+            "default_tier": "retail",
+            "active": True,
+            "notes": "Premium customer",
             "created_at": datetime.utcnow().isoformat()
         }
     ]
     customers_col.insert_many(customers)
+    
+    # Sample discount rules for demo
+    discount_rules = [
+        {
+            "id": str(uuid.uuid4()),
+            "rule_name": "Bulk Rice Discount",
+            "product_id": "",
+            "category": "Rice",
+            "min_quantity": 10,
+            "discount_type": "percentage",
+            "discount_value": 5.0,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "rule_name": "Wholesale Sugar Special",
+            "product_id": "",
+            "category": "Sugar",
+            "min_quantity": 20,
+            "discount_type": "fixed",
+            "discount_value": 50.0,
+            "active": True,
+            "created_at": datetime.utcnow().isoformat()
+        }
+    ]
+    discount_rules_col.insert_many(discount_rules)
     
     # Initialize settings
     settings_col.delete_many({})
