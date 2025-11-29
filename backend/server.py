@@ -361,6 +361,7 @@ def get_discount_rules():
 def create_discount_rule(rule: DiscountRule):
     rule_dict = rule.dict()
     discount_rules_col.insert_one(rule_dict)
+    rule_dict.pop('_id', None)
     return {"message": "Discount rule created", "rule": rule_dict}
 
 # ==================== INVENTORY ====================
