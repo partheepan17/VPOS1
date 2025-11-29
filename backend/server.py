@@ -2097,25 +2097,32 @@ def seed_sample_data():
     ]
     discount_rules_col.insert_many(discount_rules)
     
-    # Initialize settings
+    # Initialize store settings
     settings_col.delete_many({})
     settings_col.insert_one({
-        "store_name": "My Grocery Store",
-        "store_address": "123 Main Street, Colombo",
-        "store_phone": "0112345678",
-        "store_email": "info@mystore.lk",
-        "tax_id": "123456789V",
+        "store_name": "Quick Grocery POS",
+        "address": "123, Main Street, Colombo 03",
+        "phone": "011-2345678",
+        "email": "info@quickgrocery.lk",
+        "tax_id": "VAT-123456789",
         "default_language": "si",
         "default_tier": "retail",
         "currency": "LKR",
-        "tax_rate": 0.0
+        "tax_rate": 0.0,
+        "receipt_footer": "Thank you for your business! Visit us again.",
+        "low_stock_threshold": 10,
+        "created_at": datetime.utcnow().isoformat()
     })
     
     return {
-        "message": "Sample data seeded successfully",
-        "products": len(products),
-        "customers": len(customers),
-        "suppliers": len(suppliers)
+        "message": "✅ Production-ready sample data seeded successfully",
+        "summary": {
+            "products": len(products),
+            "customers": len(customers),
+            "suppliers": len(suppliers),
+            "discount_rules": len(discount_rules)
+        },
+        "note": "Demo data includes: 15 products, 6 customers, 3 suppliers, 2 discount rules"
     }
 
 if __name__ == "__main__":
