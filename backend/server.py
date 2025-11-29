@@ -621,16 +621,22 @@ def apply_discount_rules(cart_items: List[Dict], price_tier: str = "retail"):
     rules = list(discount_rules_col.find({"active": True, "auto_apply": True}, {"_id": 0}))
     
     for item in cart_items:
+        # Reset discount fields for each item
+        item['discount_amount'] = 0
+        item['discount_percent'] = 0
+        item['total'] = item['subtotal']
+        if 'applied_rule' in item:
+            del item['applied_rule']
+        
         applicable_rules = []
         
         for rule in rules:
             # Check if rule applies to this item
-            if rule['rule_type'] == 'product' and rule.get('target_id') == item['product_id']:
+            if rule['rule_type'] == 'product' and rule.get('target_id') == item.get('product_id'):
                 applicable_rules.append(rule)
             elif rule['rule_type'] == 'category':
-                # Need to fetch product to check category
-                product = products_col.find_one({"id": item['product_id']}, {"_id": 0})
-                if product and product.get('category') == rule.get('target_id'):
+                # Use category from cart item instead of fetching from DB
+                if item.get('category') and item.get('category') == rule.get('target_id'):
                     applicable_rules.append(rule)
             elif rule['rule_type'] == 'line_item':
                 # Applies to all items
