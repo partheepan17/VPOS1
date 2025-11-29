@@ -654,6 +654,28 @@ function App() {
                   Sales
                 </button>
                 <button
+                  onClick={() => setCurrentView('products')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'products'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-products"
+                >
+                  Products
+                </button>
+                <button
+                  onClick={() => setCurrentView('customers')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'customers'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-customers"
+                >
+                  Customers
+                </button>
+                <button
                   onClick={() => setCurrentView('discounts')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'discounts'
