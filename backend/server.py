@@ -480,10 +480,11 @@ def get_sale(sale_id: str):
 
 @app.post("/api/sales")
 def create_sale(sale: Sale):
-    # Generate invoice number
-    today = datetime.utcnow().strftime("%Y%m%d")
-    count = sales_col.count_documents({"invoice_number": {"$regex": f"^INV-{today}"}})
-    sale.invoice_number = f"INV-{today}-{count + 1:04d}"
+    # Generate invoice number if not provided
+    if not sale.invoice_number:
+        today = datetime.utcnow().strftime("%Y%m%d")
+        count = sales_col.count_documents({"invoice_number": {"$regex": f"^INV-{today}"}})
+        sale.invoice_number = f"INV-{today}-{count + 1:04d}"
     
     sale_dict = sale.dict()
     
