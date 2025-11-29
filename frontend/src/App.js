@@ -1347,9 +1347,6 @@ function App() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
 
       {/* Held Bills Modal */}
       {showHeldBills && (
