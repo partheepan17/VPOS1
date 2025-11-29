@@ -669,6 +669,16 @@ function App() {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">POS System</h1>
             <div className="flex items-center gap-4">
+              {/* User Info */}
+              {currentUser && (
+                <div className="flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-lg">
+                  <div className="text-right">
+                    <div className="text-sm font-semibold">{currentUser.full_name}</div>
+                    <div className="text-xs opacity-90 capitalize">{currentUser.role}</div>
+                  </div>
+                </div>
+              )}
+
               {/* Language Selector */}
               <select
                 value={language}
@@ -680,6 +690,15 @@ function App() {
                 <option value="ta">தமிழ்</option>
                 <option value="en">English</option>
               </select>
+
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition"
+                title="Logout"
+              >
+                🚪 Logout
+              </button>
               
               {/* Navigation */}
               <nav className="flex gap-2 flex-wrap">
