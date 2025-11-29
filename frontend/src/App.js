@@ -4,6 +4,8 @@ import axios from 'axios';
 import DiscountRules from './DiscountRules';
 import PriceManagement from './PriceManagement';
 import CSVManagement from './CSVManagement';
+import InventoryManagement from './InventoryManagement';
+import ReportsManagement from './ReportsManagement';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
