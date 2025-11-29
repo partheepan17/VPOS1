@@ -832,7 +832,7 @@ def create_backup():
         }
     }
     
-    # Store backup metadata
+    # Store backup metadata (without _id in response)
     backup_meta = {
         "id": backup_data["id"],
         "created_at": backup_data["created_at"],
@@ -841,12 +841,15 @@ def create_backup():
         "customers_count": len(backup_data["data"]["customers"]),
         "suppliers_count": len(backup_data["data"]["suppliers"])
     }
-    backups_col.insert_one(backup_meta)
+    backups_col.insert_one(backup_meta.copy())
+    
+    # Clean the metadata for response
+    response_meta = backup_meta.copy()
     
     return {
         "message": "Backup created successfully",
         "backup": backup_data,
-        "metadata": backup_meta
+        "metadata": response_meta
     }
 
 @app.get("/api/backups")
