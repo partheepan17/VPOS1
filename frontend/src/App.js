@@ -577,11 +577,22 @@ function App() {
         e.preventDefault();
         barcodeInputRef.current?.focus();
       }
+      // F5 - Hold Bill
+      if (e.key === 'F5') {
+        e.preventDefault();
+        holdBill();
+      }
+      // F6 - Show Held Bills
+      if (e.key === 'F6') {
+        e.preventDefault();
+        fetchHeldBills();
+        setShowHeldBills(true);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cart]);
+  }, [cart, selectedCustomer, selectedTier]);
 
   const { subtotal, totalDiscount, total } = calculateTotals();
 
