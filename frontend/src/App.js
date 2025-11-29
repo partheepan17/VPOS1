@@ -836,6 +836,17 @@ function App() {
                   {getText('reports')}
                 </button>
                 <button
+                  onClick={() => setCurrentView('analytics')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'analytics'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-analytics"
+                >
+                  Analytics
+                </button>
+                <button
                   onClick={() => setCurrentView('settings')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'settings'
