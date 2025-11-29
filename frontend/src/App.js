@@ -1019,6 +1019,92 @@ function App() {
                   </button>
                 </div>
               </div>
+              {/* Product Search */}
+              <div className="bg-white rounded-lg shadow-md p-6 relative">
+                <label className="block text-lg font-semibold text-gray-700 mb-3">
+                  Search Products by Name, SKU, or ID
+                  <span className="shortcut-hint text-gray-500">(F3)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={productSearchTerm}
+                    onChange={(e) => handleProductSearch(e.target.value)}
+                    onFocus={() => productSearchTerm.length >= 2 && setShowSearchResults(true)}
+                    onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                    className="w-full px-4 py-3 border-2 border-secondary-300 rounded-lg focus:outline-none focus:border-secondary-500 text-lg"
+                    placeholder="Search: Rice, SKU-001, or product ID..."
+                    data-testid="product-search-input"
+                  />
+                  
+                  {/* Search Results Dropdown */}
+                  {showSearchResults && searchResults.length > 0 && (
+                    <div className="absolute z-50 w-full mt-2 bg-white border-2 border-secondary-300 rounded-lg shadow-xl max-h-96 overflow-y-auto">
+                      {searchResults.map((product, index) => (
+                        <div
+                          key={product.id}
+                          onClick={() => addProductFromSearch(product)}
+                          className="p-4 hover:bg-secondary-50 cursor-pointer border-b border-gray-200 last:border-b-0 transition"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="font-semibold text-gray-900">
+                                {language === 'si' && product.name_si ? product.name_si : 
+                                 language === 'ta' && product.name_ta ? product.name_ta : 
+                                 product.name_en}
+                              </div>
+                              <div className="text-sm text-gray-600 mt-1">
+                                <span className="font-medium">SKU:</span> {product.sku}
+                                {product.category && (
+                                  <span className="ml-3">
+                                    <span className="font-medium">Category:</span> {product.category}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                Stock: {product.stock} {product.unit}
+                              </div>
+                            </div>
+                            <div className="ml-4 text-right">
+                              <div className="text-lg font-bold text-primary-600">
+                                LKR {product[`price_${selectedTier}`] || product.price_retail}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {selectedTier}
+                              </div>
+                            </div>
+                          </div>
+                          {/* Show barcodes if available */}
+                          {product.barcodes && product.barcodes.length > 0 && (
+                            <div className="text-xs text-gray-500 mt-2">
+                              Barcode: {product.barcodes[0]}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* No Results Message */}
+                  {showSearchResults && searchResults.length === 0 && productSearchTerm.length >= 2 && (
+                    <div className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4">
+                      <div className="text-center text-gray-500">
+                        <svg className="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="font-medium">No products found</p>
+                        <p className="text-sm mt-1">Try a different search term</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Search Tips */}
+                <div className="mt-3 text-sm text-gray-600">
+                  <span className="font-medium">Search by:</span> Product Name (සිංහල/தமிழ்/English) · SKU · Product ID
+                </div>
+              </div>
 
               {/* Shopping Cart */}
               <div className="bg-white rounded-lg shadow-md p-6">
