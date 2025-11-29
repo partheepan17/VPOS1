@@ -682,6 +682,284 @@ def apply_discount_rules(cart_items: List[Dict], price_tier: str = "retail"):
     
     return {"items": cart_items}
 
+# ==================== INVENTORY MANAGEMENT ====================
+
+def calculate_weighted_avg_cost(product_id: str, new_qty: float, new_cost: float):
+    """Calculate weighted average cost for a product"""
+    product = products_col.find_one({"id": product_id}, {"_id": 0})
+    if not product:
+        return new_cost
+    
+    current_stock = product.get('stock', 0)
+    current_avg_cost = product.get('weighted_avg_cost', 0)
+    
+    if current_stock <= 0:
+        return new_cost
+    
+    total_value = (current_stock * current_avg_cost) + (new_qty * new_cost)
+    total_qty = current_stock + new_qty
+    
+    return round(total_value / total_qty, 2) if total_qty > 0 else new_cost
+
+def log_stock_movement(product_id: str, movement_type: str, quantity: float, 
+                       reason: str, cost_price: float, user_id: str, 
+                       reference_id: str = "", notes: str = ""):
+    """Log all stock movements for audit trail"""
+    movement = {
+        "id": str(uuid.uuid4()),
+        "product_id": product_id,
+        "type": movement_type,  # GRN, SALE, ADJUSTMENT, OPENING
+        "quantity": quantity,
+        "reason": reason,
+        "cost_price": cost_price,
+        "user_id": user_id,
+        "reference_id": reference_id,
+        "notes": notes,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    stock_movements_col.insert_one(movement)
+    return movement
+
+@app.post("/api/grn")
+def create_grn(grn_data: Dict, current_user: Dict = Depends(get_current_user)):
+    """Create Goods Received Note (Stock Entry)"""
+    grn = {
+        "id": str(uuid.uuid4()),
+        "grn_number": f"GRN-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{str(uuid.uuid4())[:8].upper()}",
+        "supplier_id": grn_data.get('supplier_id', ''),
+        "received_date": grn_data.get('received_date', datetime.now(timezone.utc).isoformat()),
+        "items": grn_data.get('items', []),
+        "total_cost": 0,
+        "notes": grn_data.get('notes', ''),
+        "created_by": current_user['id'],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    total_cost = 0
+    
+    for item in grn['items']:
+        product_id = item['product_id']
+        quantity = float(item['quantity'])
+        cost_price = float(item['cost_price'])
+        batch_number = item.get('batch_number', '')
+        expiry_date = item.get('expiry_date', '')
+        
+        product = products_col.find_one({"id": product_id}, {"_id": 0})
+        if not product:
+            continue
+        
+        # Calculate new weighted average cost
+        new_weighted_avg = calculate_weighted_avg_cost(product_id, quantity, cost_price)
+        
+        # Update product stock and costs
+        new_stock = product.get('stock', 0) + quantity
+        
+        update_data = {
+            "stock": new_stock,
+            "weighted_avg_cost": new_weighted_avg,
+            "last_purchase_price": cost_price,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Add batch tracking if provided
+        if batch_number or expiry_date:
+            batches = product.get('batches', [])
+            batches.append({
+                "batch_number": batch_number,
+                "quantity": quantity,
+                "cost_price": cost_price,
+                "expiry_date": expiry_date,
+                "received_date": grn['received_date']
+            })
+            update_data['batches'] = batches
+        
+        products_col.update_one({"id": product_id}, {"$set": update_data})
+        
+        # Log stock movement
+        log_stock_movement(
+            product_id=product_id,
+            movement_type="GRN",
+            quantity=quantity,
+            reason=f"Stock received from supplier (GRN: {grn['grn_number']})",
+            cost_price=cost_price,
+            user_id=current_user['id'],
+            reference_id=grn['id'],
+            notes=f"Batch: {batch_number}, Expiry: {expiry_date}" if batch_number else ""
+        )
+        
+        total_cost += quantity * cost_price
+    
+    grn['total_cost'] = round(total_cost, 2)
+    grn_records_col.insert_one(grn)
+    
+    return {"message": "GRN created successfully", "grn": serialize_doc(grn)}
+
+@app.get("/api/grn")
+def get_grn_records(current_user: Dict = Depends(get_current_user)):
+    """Get all GRN records"""
+    grns = list(grn_records_col.find({}, {"_id": 0}).sort("created_at", -1).limit(100))
+    return {"grns": [serialize_doc(g) for g in grns]}
+
+@app.post("/api/stock-adjustments")
+def create_stock_adjustment(adjustment_data: Dict, current_user: Dict = Depends(get_current_user)):
+    """Create stock adjustment request (damage/expiry/theft/internal use)"""
+    adjustment = {
+        "id": str(uuid.uuid4()),
+        "product_id": adjustment_data['product_id'],
+        "quantity": float(adjustment_data['quantity']),
+        "reason": adjustment_data['reason'],  # DAMAGE, EXPIRED, THEFT, INTERNAL_USE
+        "notes": adjustment_data.get('notes', ''),
+        "batch_number": adjustment_data.get('batch_number', ''),
+        "status": "APPROVED" if current_user.get('role') == 'manager' else "PENDING",
+        "requested_by": current_user['id'],
+        "requested_at": datetime.now(timezone.utc).isoformat(),
+        "approved_by": current_user['id'] if current_user.get('role') == 'manager' else None,
+        "approved_at": datetime.now(timezone.utc).isoformat() if current_user.get('role') == 'manager' else None
+    }
+    
+    # If manager creates it, auto-approve and apply
+    if current_user.get('role') == 'manager':
+        product = products_col.find_one({"id": adjustment['product_id']}, {"_id": 0})
+        if product:
+            new_stock = product.get('stock', 0) - adjustment['quantity']
+            products_col.update_one(
+                {"id": adjustment['product_id']},
+                {"$set": {
+                    "stock": new_stock,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            
+            # Log stock movement
+            log_stock_movement(
+                product_id=adjustment['product_id'],
+                movement_type="ADJUSTMENT",
+                quantity=-adjustment['quantity'],
+                reason=adjustment['reason'],
+                cost_price=product.get('weighted_avg_cost', 0),
+                user_id=current_user['id'],
+                reference_id=adjustment['id'],
+                notes=adjustment['notes']
+            )
+    
+    adjustment_requests_col.insert_one(adjustment)
+    
+    return {"message": "Adjustment request created", "adjustment": serialize_doc(adjustment)}
+
+@app.get("/api/stock-adjustments")
+def get_stock_adjustments(status: str = "ALL", current_user: Dict = Depends(get_current_user)):
+    """Get stock adjustment requests"""
+    query = {}
+    if status != "ALL":
+        query['status'] = status
+    
+    adjustments = list(adjustment_requests_col.find(query, {"_id": 0}).sort("requested_at", -1).limit(100))
+    return {"adjustments": [serialize_doc(a) for a in adjustments]}
+
+@app.put("/api/stock-adjustments/{adjustment_id}/approve")
+def approve_stock_adjustment(adjustment_id: str, action: str, current_user: Dict = Depends(get_current_user)):
+    """Approve or reject stock adjustment request (Manager only)"""
+    if current_user.get('role') != 'manager':
+        raise HTTPException(status_code=403, detail="Only managers can approve adjustments")
+    
+    adjustment = adjustment_requests_col.find_one({"id": adjustment_id}, {"_id": 0})
+    if not adjustment:
+        raise HTTPException(status_code=404, detail="Adjustment request not found")
+    
+    if adjustment['status'] != 'PENDING':
+        raise HTTPException(status_code=400, detail="Adjustment already processed")
+    
+    new_status = "APPROVED" if action == "approve" else "REJECTED"
+    
+    update_data = {
+        "status": new_status,
+        "approved_by": current_user['id'],
+        "approved_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Apply stock changes if approved
+    if action == "approve":
+        product = products_col.find_one({"id": adjustment['product_id']}, {"_id": 0})
+        if product:
+            new_stock = product.get('stock', 0) - adjustment['quantity']
+            products_col.update_one(
+                {"id": adjustment['product_id']},
+                {"$set": {
+                    "stock": new_stock,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            
+            # Log stock movement
+            log_stock_movement(
+                product_id=adjustment['product_id'],
+                movement_type="ADJUSTMENT",
+                quantity=-adjustment['quantity'],
+                reason=adjustment['reason'],
+                cost_price=product.get('weighted_avg_cost', 0),
+                user_id=current_user['id'],
+                reference_id=adjustment['id'],
+                notes=adjustment['notes']
+            )
+    
+    adjustment_requests_col.update_one({"id": adjustment_id}, {"$set": update_data})
+    
+    return {"message": f"Adjustment {new_status.lower()}", "adjustment_id": adjustment_id}
+
+@app.get("/api/stock-movements/{product_id}")
+def get_stock_movements(product_id: str, current_user: Dict = Depends(get_current_user)):
+    """Get stock movement history for a product (audit trail)"""
+    movements = list(stock_movements_col.find(
+        {"product_id": product_id},
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(200))
+    
+    product = products_col.find_one({"id": product_id}, {"_id": 0})
+    
+    return {
+        "product": serialize_doc(product) if product else None,
+        "movements": [serialize_doc(m) for m in movements]
+    }
+
+@app.get("/api/products/low-stock")
+def get_low_stock_products(current_user: Dict = Depends(get_current_user)):
+    """Get products with stock below reorder point"""
+    products = list(products_col.find(
+        {
+            "active": True,
+            "$expr": {"$lte": ["$stock", "$reorder_level"]}
+        },
+        {"_id": 0}
+    ).limit(50))
+    
+    return {"products": [serialize_doc(p) for p in products]}
+
+@app.get("/api/products/expiring-soon")
+def get_expiring_products(days: int = 30, current_user: Dict = Depends(get_current_user)):
+    """Get products with batches expiring soon"""
+    from datetime import datetime, timedelta
+    
+    cutoff_date = (datetime.now(timezone.utc) + timedelta(days=days)).isoformat()
+    
+    products = list(products_col.find(
+        {
+            "active": True,
+            "batches": {"$exists": True, "$ne": []}
+        },
+        {"_id": 0}
+    ))
+    
+    expiring_products = []
+    for product in products:
+        for batch in product.get('batches', []):
+            if batch.get('expiry_date') and batch['expiry_date'] <= cutoff_date:
+                expiring_products.append({
+                    "product": serialize_doc(product),
+                    "batch": batch
+                })
+    
+    return {"expiring_batches": expiring_products}
+
 # ==================== ADVANCED REPORTS ====================
 
 @app.get("/api/reports/sales-trends")
