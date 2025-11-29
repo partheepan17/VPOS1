@@ -722,6 +722,17 @@ function App() {
                   CSV
                 </button>
                 <button
+                  onClick={() => setCurrentView('labels')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'labels'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-labels"
+                >
+                  Labels
+                </button>
+                <button
                   onClick={() => setCurrentView('inventory')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'inventory'
