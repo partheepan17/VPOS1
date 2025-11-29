@@ -10,6 +10,7 @@ import SettingsManagement from './SettingsManagement';
 import TerminalManagement from './TerminalManagement';
 import ProductsManagement from './ProductsManagement';
 import CustomersManagement from './CustomersManagement';
+import Dashboard from './Dashboard';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
