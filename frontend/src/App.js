@@ -230,11 +230,18 @@ function App() {
     setCurrentView('dashboard');
   };
 
-  // Auto-focus barcode input on mount
+  // Auto-focus barcode input on mount and cleanup timer
   useEffect(() => {
     if (currentView === 'pos' && barcodeInputRef.current) {
       barcodeInputRef.current.focus();
     }
+    
+    // Cleanup barcode auto-enter timer on unmount
+    return () => {
+      if (barcodeTimerRef.current) {
+        clearTimeout(barcodeTimerRef.current);
+      }
+    };
   }, [currentView]);
 
   // Barcode scanner detection (detects rapid keyboard input)
