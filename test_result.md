@@ -11,7 +11,7 @@ backend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "✓ All API endpoints (products, customers, sales, discount-rules) return responses without _id fields. MongoDB serialization is working correctly."
+        comment: "✓ VERIFIED: All API endpoints (products, customers, sales, discount-rules, suppliers, settings) properly exclude MongoDB _id fields. The serialize_doc() helper function and explicit {\"_id\": 0} projections are working correctly. No ObjectId serialization errors detected."
 
   - task: "Products Management API"
     implemented: true
