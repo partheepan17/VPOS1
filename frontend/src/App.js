@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import axios from 'axios';
+import DiscountRules from './DiscountRules';
+import PriceManagement from './PriceManagement';
+import CSVManagement from './CSVManagement';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
