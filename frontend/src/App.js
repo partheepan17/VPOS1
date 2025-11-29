@@ -61,6 +61,7 @@ function App() {
   const barcodeInputRef = useRef(null);
   const scanBuffer = useRef('');
   const scanTimeout = useRef(null);
+  const barcodeTimerRef = useRef(null);
 
   // Language translations
   const t = {
