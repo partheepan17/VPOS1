@@ -1001,6 +1001,14 @@ function App() {
           </div>
         )}
 
+        {currentView === 'products' && (
+          <ProductsManagement language={language} getText={getText} />
+        )}
+
+        {currentView === 'customers' && (
+          <CustomersManagement language={language} getText={getText} />
+        )}
+
         {currentView === 'discounts' && (
           <DiscountRules language={language} getText={getText} />
         )}
