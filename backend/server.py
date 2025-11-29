@@ -1371,19 +1371,7 @@ def get_customer_stats(start_date: str = "", end_date: str = ""):
 
 # ==================== HELD BILLS ====================
 
-class HeldBill(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    customer_id: Optional[str] = None
-    customer_name: str = ""
-    price_tier: str = "retail"
-    items: List[SaleItem]
-    subtotal: float
-    total_discount: float
-    total: float
-    terminal_name: str = "Terminal 1"
-    cashier_name: str = "Cashier"
-    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
-    notes: str = ""
+from models import HeldBill
 
 @app.get("/api/held-bills")
 def get_held_bills():
