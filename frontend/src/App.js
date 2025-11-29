@@ -739,17 +739,37 @@ function App() {
 
               {/* Shopping Cart */}
               <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
                   <h2 className="text-xl font-bold text-gray-800">
                     {getText('cart')} ({cart.length} {cart.length === 1 ? 'item' : 'items'})
                   </h2>
-                  <button
-                    onClick={clearCart}
-                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition btn-press"
-                    data-testid="clear-cart-btn"
-                  >
-                    {getText('clear')} <span className="shortcut-hint">(F3)</span>
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        fetchHeldBills();
+                        setShowHeldBills(true);
+                      }}
+                      className="px-3 py-2 bg-accent-500 hover:bg-accent-600 text-white rounded-lg font-medium text-sm transition btn-press"
+                      data-testid="show-held-btn"
+                    >
+                      📋 Held ({heldBills.length})
+                    </button>
+                    <button
+                      onClick={holdBill}
+                      disabled={cart.length === 0}
+                      className="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white rounded-lg font-medium text-sm transition btn-press"
+                      data-testid="hold-bill-btn"
+                    >
+                      ⏸️ Hold (F5)
+                    </button>
+                    <button
+                      onClick={clearCart}
+                      className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium text-sm transition btn-press"
+                      data-testid="clear-cart-btn"
+                    >
+                      🗑️ Clear (F3)
+                    </button>
+                  </div>
                 </div>
 
                 {cart.length === 0 ? (
