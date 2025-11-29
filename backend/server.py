@@ -347,6 +347,7 @@ def get_suppliers(skip: int = 0, limit: int = 100):
 def create_supplier(supplier: Supplier):
     supplier_dict = supplier.dict()
     suppliers_col.insert_one(supplier_dict)
+    supplier_dict.pop('_id', None)
     return {"message": "Supplier created", "supplier": supplier_dict}
 
 # ==================== DISCOUNT RULES ====================
