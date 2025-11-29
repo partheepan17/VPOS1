@@ -840,36 +840,36 @@ function App() {
                 </button>
                 <button
                   onClick={() => setCurrentView('pos')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'pos'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-600 shadow-md nav-button-active'
+                      : 'bg-primary-700 text-white hover:bg-primary-800 hover:shadow-lg'
                   }`}
                   data-testid="nav-pos"
                 >
-                  {getText('pos')}
+                  🛒 {getText('pos')}
                 </button>
                 <button
                   onClick={() => setCurrentView('sales')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'sales'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-600 shadow-md nav-button-active'
+                      : 'bg-primary-700 text-white hover:bg-primary-800 hover:shadow-lg'
                   }`}
                   data-testid="nav-sales"
                 >
-                  {getText('sales')}
+                  💰 {getText('sales')}
                 </button>
                 <button
                   onClick={() => setCurrentView('products')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'products'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-600 shadow-md nav-button-active'
+                      : 'bg-primary-700 text-white hover:bg-primary-800 hover:shadow-lg'
                   }`}
                   data-testid="nav-products"
                 >
-                  {getText('products')}
+                  📦 {getText('products')}
                 </button>
                 <button
                   onClick={() => setCurrentView('customers')}
