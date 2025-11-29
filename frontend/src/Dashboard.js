@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
-function Dashboard({ language, getText }) {
+function Dashboard({ language, getText, onNavigate }) {
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalCustomers: 0,
