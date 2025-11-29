@@ -717,6 +717,17 @@ function App() {
                 >
                   Settings
                 </button>
+                <button
+                  onClick={() => setCurrentView('terminals')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'terminals'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-terminals"
+                >
+                  Terminals
+                </button>
               </nav>
             </div>
           </div>
