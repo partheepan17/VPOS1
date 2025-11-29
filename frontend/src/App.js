@@ -9,6 +9,7 @@ import CSVManagement from './CSVManagement';
 import InventoryManagement from './InventoryManagement';
 import ReportsManagement from './ReportsManagement';
 import SettingsManagement from './SettingsManagement';
+import DeviceSettings from './DeviceSettings';
 import TerminalManagement from './TerminalManagement';
 import ProductsManagement from './ProductsManagement';
 import CustomersManagement from './CustomersManagement';
