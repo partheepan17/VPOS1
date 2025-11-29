@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import axios from 'axios';
+import { getTranslation } from './translations';
 import DiscountRules from './DiscountRules';
 import PriceManagement from './PriceManagement';
 import CSVManagement from './CSVManagement';
