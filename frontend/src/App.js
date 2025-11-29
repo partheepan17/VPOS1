@@ -829,14 +829,14 @@ function App() {
               <nav className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setCurrentView('dashboard')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'dashboard'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-600 shadow-md nav-button-active'
+                      : 'bg-primary-700 text-white hover:bg-primary-800 hover:shadow-lg'
                   }`}
                   data-testid="nav-dashboard"
                 >
-                  {getText('dashboard')}
+                  🏠 {getText('dashboard')}
                 </button>
                 <button
                   onClick={() => setCurrentView('pos')}
