@@ -341,13 +341,14 @@ function App() {
       newCart[existingIndex].total = newCart[existingIndex].subtotal - newCart[existingIndex].discount_amount;
       setCart(newCart);
     } else {
-      // Add new item
+      // Add new item with all language names for invoice printing
       const newItem = {
         product_id: product.id,
         sku: product.sku,
-        name: product.name_en,
-        name_si: product.name_si,
-        name_ta: product.name_ta,
+        name: product.name_en, // English (default for display)
+        name_en: product.name_en,
+        name_si: product.name_si || product.name_en,
+        name_ta: product.name_ta || product.name_en,
         quantity: 1,
         weight: 0,
         weight_based: product.weight_based,
