@@ -1750,13 +1750,7 @@ def bulk_update_prices(rule: Dict):
 
 # ==================== TERMINALS ====================
 
-class Terminal(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    ip_address: str = ""
-    status: str = "active"  # active, inactive, offline
-    last_sync: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
-    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+from models import Terminal
 
 @app.get("/api/terminals")
 def get_terminals():
