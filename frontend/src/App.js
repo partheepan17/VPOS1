@@ -894,6 +894,39 @@ function App() {
                   {getText('labels')}
                 </button>
                 <button
+                  onClick={() => setCurrentView('stock-entry')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'stock-entry'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-stock-entry"
+                >
+                  📦 Stock Entry
+                </button>
+                <button
+                  onClick={() => setCurrentView('stock-adjustments')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'stock-adjustments'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-stock-adjustments"
+                >
+                  📝 Adjustments
+                </button>
+                <button
+                  onClick={() => setCurrentView('stock-movements')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'stock-movements'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-stock-movements"
+                >
+                  📊 Stock History
+                </button>
+                <button
                   onClick={() => setCurrentView('inventory')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'inventory'
