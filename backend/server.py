@@ -535,6 +535,238 @@ def get_sales_summary(start_date: str = "", end_date: str = ""):
         "tier_summary": tier_summary
     }
 
+@app.get("/api/reports/top-products")
+def get_top_products(start_date: str = "", end_date: str = "", limit: int = 10):
+    """Get top selling products by quantity and revenue"""
+    query = {"status": "completed"}
+    
+    if start_date:
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        if "created_at" not in query:
+            query["created_at"] = {}
+        query["created_at"]["$lte"] = end_date
+    
+    sales = list(sales_col.find(query, {"_id": 0}))
+    
+    # Aggregate by product
+    product_stats = {}
+    for sale in sales:
+        for item in sale.get("items", []):
+            product_id = item.get("product_id")
+            if product_id not in product_stats:
+                product_stats[product_id] = {
+                    "product_id": product_id,
+                    "sku": item.get("sku", ""),
+                    "name": item.get("name", ""),
+                    "quantity_sold": 0,
+                    "revenue": 0
+                }
+            product_stats[product_id]["quantity_sold"] += item.get("quantity", 0)
+            product_stats[product_id]["revenue"] += item.get("total", 0)
+    
+    # Sort by revenue
+    top_products = sorted(product_stats.values(), key=lambda x: x["revenue"], reverse=True)[:limit]
+    
+    return {"products": top_products}
+
+@app.get("/api/reports/top-categories")
+def get_top_categories(start_date: str = "", end_date: str = ""):
+    """Get top selling categories"""
+    query = {"status": "completed"}
+    
+    if start_date:
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        if "created_at" not in query:
+            query["created_at"] = {}
+        query["created_at"]["$lte"] = end_date
+    
+    sales = list(sales_col.find(query, {"_id": 0}))
+    
+    # Get all products for category mapping
+    products = {p["id"]: p for p in products_col.find({}, {"_id": 0})}
+    
+    # Aggregate by category
+    category_stats = {}
+    for sale in sales:
+        for item in sale.get("items", []):
+            product_id = item.get("product_id")
+            if product_id in products:
+                category = products[product_id].get("category", "Uncategorized")
+                if category not in category_stats:
+                    category_stats[category] = {
+                        "category": category,
+                        "quantity_sold": 0,
+                        "revenue": 0,
+                        "items_count": 0
+                    }
+                category_stats[category]["quantity_sold"] += item.get("quantity", 0)
+                category_stats[category]["revenue"] += item.get("total", 0)
+                category_stats[category]["items_count"] += 1
+    
+    # Sort by revenue
+    top_categories = sorted(category_stats.values(), key=lambda x: x["revenue"], reverse=True)
+    
+    return {"categories": top_categories}
+
+@app.get("/api/reports/discount-usage")
+def get_discount_usage(start_date: str = "", end_date: str = ""):
+    """Get discount usage statistics"""
+    query = {"status": "completed"}
+    
+    if start_date:
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        if "created_at" not in query:
+            query["created_at"] = {}
+        query["created_at"]["$lte"] = end_date
+    
+    sales = list(sales_col.find(query, {"_id": 0}))
+    
+    total_discount = sum(sale.get("total_discount", 0) for sale in sales)
+    invoices_with_discount = sum(1 for sale in sales if sale.get("total_discount", 0) > 0)
+    
+    # Discount by rule (if tracked in items)
+    rule_stats = {}
+    for sale in sales:
+        for item in sale.get("items", []):
+            if item.get("discount_amount", 0) > 0:
+                rule_name = item.get("applied_rule", "Manual Discount")
+                if rule_name not in rule_stats:
+                    rule_stats[rule_name] = {
+                        "rule_name": rule_name,
+                        "times_applied": 0,
+                        "total_discount": 0
+                    }
+                rule_stats[rule_name]["times_applied"] += 1
+                rule_stats[rule_name]["total_discount"] += item.get("discount_amount", 0)
+    
+    return {
+        "total_discount": total_discount,
+        "invoices_with_discount": invoices_with_discount,
+        "total_invoices": len(sales),
+        "discount_percentage": (invoices_with_discount / len(sales) * 100) if len(sales) > 0 else 0,
+        "rule_usage": list(rule_stats.values())
+    }
+
+@app.get("/api/reports/daily-sales")
+def get_daily_sales(days: int = 7):
+    """Get daily sales for the last N days"""
+    from datetime import datetime, timedelta
+    
+    end_date = datetime.utcnow()
+    start_date = end_date - timedelta(days=days)
+    
+    sales = list(sales_col.find({
+        "status": "completed",
+        "created_at": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}))
+    
+    # Group by date
+    daily_stats = {}
+    for sale in sales:
+        date = sale.get("created_at", "")[:10]  # Get YYYY-MM-DD
+        if date not in daily_stats:
+            daily_stats[date] = {
+                "date": date,
+                "revenue": 0,
+                "invoices": 0,
+                "items_sold": 0
+            }
+        daily_stats[date]["revenue"] += sale.get("total", 0)
+        daily_stats[date]["invoices"] += 1
+        daily_stats[date]["items_sold"] += sum(item.get("quantity", 0) for item in sale.get("items", []))
+    
+    # Sort by date
+    daily_data = sorted(daily_stats.values(), key=lambda x: x["date"])
+    
+    return {"daily_sales": daily_data}
+
+@app.get("/api/inventory/logs")
+def get_inventory_logs(product_id: str = "", limit: int = 50):
+    """Get inventory transaction logs"""
+    query = {}
+    if product_id:
+        query["product_id"] = product_id
+    
+    logs = list(inventory_logs_col.find(query, {"_id": 0}).sort("created_at", DESCENDING).limit(limit))
+    
+    # Enrich with product names
+    product_ids = set(log.get("product_id") for log in logs)
+    products = {p["id"]: p for p in products_col.find({"id": {"$in": list(product_ids)}}, {"_id": 0})}
+    
+    for log in logs:
+        product_id = log.get("product_id")
+        if product_id in products:
+            log["product_name"] = products[product_id].get("name_en", "")
+            log["sku"] = products[product_id].get("sku", "")
+    
+    return {"logs": logs, "total": len(logs)}
+
+@app.get("/api/inventory/alerts")
+def get_inventory_alerts():
+    """Get products with low stock (below reorder level)"""
+    pipeline = [
+        {"$match": {"active": True}},
+        {"$addFields": {
+            "needs_reorder": {"$lte": ["$stock", "$reorder_level"]}
+        }},
+        {"$match": {"needs_reorder": True}},
+        {"$project": {"_id": 0}}
+    ]
+    
+    products = list(products_col.aggregate(pipeline))
+    
+    # Calculate suggested order quantity (simple: 2x reorder level - current stock)
+    for product in products:
+        suggested_qty = max(0, (product.get("reorder_level", 0) * 2) - product.get("stock", 0))
+        product["suggested_order_qty"] = suggested_qty
+        product["stock_status"] = "critical" if product.get("stock", 0) == 0 else "low"
+    
+    return {"alerts": products, "count": len(products)}
+
+@app.get("/api/reports/customer-stats")
+def get_customer_stats(start_date: str = "", end_date: str = ""):
+    """Get customer purchase statistics"""
+    query = {"status": "completed"}
+    
+    if start_date:
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        if "created_at" not in query:
+            query["created_at"] = {}
+        query["created_at"]["$lte"] = end_date
+    
+    sales = list(sales_col.find(query, {"_id": 0}))
+    
+    # Aggregate by customer
+    customer_stats = {}
+    for sale in sales:
+        customer_id = sale.get("customer_id") or "walk-in"
+        customer_name = sale.get("customer_name", "Walk-in")
+        
+        if customer_id not in customer_stats:
+            customer_stats[customer_id] = {
+                "customer_id": customer_id,
+                "customer_name": customer_name,
+                "total_purchases": 0,
+                "total_spent": 0,
+                "avg_purchase": 0
+            }
+        
+        customer_stats[customer_id]["total_purchases"] += 1
+        customer_stats[customer_id]["total_spent"] += sale.get("total", 0)
+    
+    # Calculate averages
+    for stats in customer_stats.values():
+        stats["avg_purchase"] = stats["total_spent"] / stats["total_purchases"] if stats["total_purchases"] > 0 else 0
+    
+    # Sort by total spent
+    top_customers = sorted(customer_stats.values(), key=lambda x: x["total_spent"], reverse=True)
+    
+    return {"customers": top_customers}
+
 # ==================== SETTINGS ====================
 
 @app.get("/api/settings")
