@@ -1427,6 +1427,10 @@ function App() {
           <SettingsManagement language={language} getText={getText} />
         )}
 
+        {currentView === 'devices' && (
+          <DeviceSettings language={language} getText={getText} />
+        )}
+
         {currentView === 'terminals' && (
           <TerminalManagement language={language} getText={getText} />
         )}
