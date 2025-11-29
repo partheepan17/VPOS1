@@ -367,6 +367,76 @@ def create_discount_rule(rule: DiscountRule):
     rule_dict.pop('_id', None)
     return {"message": "Discount rule created", "rule": rule_dict}
 
+@app.put("/api/discount-rules/{rule_id}")
+def update_discount_rule(rule_id: str, rule: DiscountRule):
+    rule_dict = rule.dict()
+    result = discount_rules_col.update_one({"id": rule_id}, {"$set": rule_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Discount rule not found")
+    return {"message": "Discount rule updated"}
+
+@app.delete("/api/discount-rules/{rule_id}")
+def delete_discount_rule(rule_id: str):
+    result = discount_rules_col.update_one({"id": rule_id}, {"$set": {"active": False}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Discount rule not found")
+    return {"message": "Discount rule deleted"}
+
+@app.post("/api/discount-rules/apply")
+def apply_discount_rules(cart_items: List[Dict], price_tier: str = "retail"):
+    """Apply auto-apply discount rules to cart items"""
+    rules = list(discount_rules_col.find({"active": True, "auto_apply": True}, {"_id": 0}))
+    
+    for item in cart_items:
+        applicable_rules = []
+        
+        for rule in rules:
+            # Check if rule applies to this item
+            if rule['rule_type'] == 'product' and rule.get('target_id') == item['product_id']:
+                applicable_rules.append(rule)
+            elif rule['rule_type'] == 'category':
+                # Need to fetch product to check category
+                product = products_col.find_one({"id": item['product_id']}, {"_id": 0})
+                if product and product.get('category') == rule.get('target_id'):
+                    applicable_rules.append(rule)
+            elif rule['rule_type'] == 'line_item':
+                # Applies to all items
+                applicable_rules.append(rule)
+        
+        # Apply best discount
+        if applicable_rules:
+            best_discount = 0
+            best_rule = None
+            
+            for rule in applicable_rules:
+                # Check quantity conditions
+                if rule.get('min_quantity', 0) > 0 and item['quantity'] < rule['min_quantity']:
+                    continue
+                if rule.get('max_quantity', 0) > 0 and item['quantity'] > rule['max_quantity']:
+                    continue
+                
+                # Calculate discount
+                if rule['discount_type'] == 'percent':
+                    discount = (item['subtotal'] * rule['discount_value']) / 100
+                else:  # fixed
+                    discount = rule['discount_value'] * item['quantity']
+                
+                # Apply max discount cap
+                if rule.get('max_discount', 0) > 0:
+                    discount = min(discount, rule['max_discount'])
+                
+                if discount > best_discount:
+                    best_discount = discount
+                    best_rule = rule
+            
+            if best_rule:
+                item['discount_amount'] = best_discount
+                item['discount_percent'] = (best_discount / item['subtotal'] * 100) if item['subtotal'] > 0 else 0
+                item['total'] = item['subtotal'] - best_discount
+                item['applied_rule'] = best_rule['name']
+    
+    return {"items": cart_items}
+
 # ==================== INVENTORY ====================
 
 @app.post("/api/inventory/receive")
