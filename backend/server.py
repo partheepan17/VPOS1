@@ -25,11 +25,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# MongoDB connection
+# MongoDB connection with connection pooling
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/')
 db_name = os.environ.get('DATABASE_NAME', 'pos_system')
-client = MongoClient(mongo_url)
+
+# Configure connection pooling for production
+client = MongoClient(
+    mongo_url,
+    maxPoolSize=50,  # Maximum connections in the pool
+    minPoolSize=10,  # Minimum connections maintained
+    maxIdleTimeMS=30000,  # Close idle connections after 30 seconds
+    serverSelectionTimeoutMS=5000,  # Timeout for server selection
+    connectTimeoutMS=10000,  # Connection timeout
+    socketTimeoutMS=30000,  # Socket timeout
+    retryWrites=True,  # Automatic retry for write operations
+    w='majority'  # Write concern for durability
+)
+
 db = client[db_name]
+
+# Verify connection on startup
+try:
+    client.admin.command('ping')
+    print(f"✅ MongoDB connected successfully to {db_name}")
+except Exception as e:
+    print(f"❌ MongoDB connection failed: {e}")
+    raise
 
 # Collections
 products_col = db['products']
