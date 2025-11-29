@@ -51,6 +51,21 @@ sales_col.create_index([('invoice_number', ASCENDING)], unique=True)
 sales_col.create_index([('created_at', DESCENDING)])
 customers_col.create_index([('phone', ASCENDING)])
 
+# ==================== HELPER FUNCTIONS ====================
+
+def serialize_doc(doc):
+    """
+    Remove MongoDB's _id field from a document to ensure JSON serialization.
+    Can be used for both single documents and lists of documents.
+    """
+    if doc is None:
+        return None
+    if isinstance(doc, list):
+        return [serialize_doc(d) for d in doc]
+    if isinstance(doc, dict):
+        doc.pop('_id', None)
+    return doc
+
 # ==================== MODELS ====================
 
 class Product(BaseModel):
