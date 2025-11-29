@@ -447,6 +447,8 @@ def create_product(product: Product):
 def update_product(product_id: str, product: Product):
     product_dict = product.dict()
     product_dict["updated_at"] = datetime.utcnow().isoformat()
+    # Ensure we don't overwrite the id field
+    product_dict["id"] = product_id
     result = products_col.update_one({"id": product_id}, {"$set": product_dict})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
