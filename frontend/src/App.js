@@ -327,10 +327,11 @@ function App() {
     }
   };
 
-  const addToCart = (product) => {
+  const addToCart = async (product) => {
     const priceField = `price_${selectedTier}`;
     const unitPrice = product[priceField] || product.price_retail;
 
+    let updatedCart;
     const existingIndex = cart.findIndex(item => item.product_id === product.id);
     
     if (existingIndex >= 0) {
@@ -339,7 +340,7 @@ function App() {
       newCart[existingIndex].quantity += 1;
       newCart[existingIndex].subtotal = newCart[existingIndex].quantity * newCart[existingIndex].unit_price;
       newCart[existingIndex].total = newCart[existingIndex].subtotal - newCart[existingIndex].discount_amount;
-      setCart(newCart);
+      updatedCart = newCart;
     } else {
       // Add new item with all language names for invoice printing
       const newItem = {
@@ -349,6 +350,7 @@ function App() {
         name_en: product.name_en,
         name_si: product.name_si || product.name_en,
         name_ta: product.name_ta || product.name_en,
+        category: product.category || '',
         quantity: 1,
         weight: 0,
         weight_based: product.weight_based,
@@ -358,7 +360,20 @@ function App() {
         subtotal: unitPrice,
         total: unitPrice
       };
-      setCart([...cart, newItem]);
+      updatedCart = [...cart, newItem];
+    }
+    
+    // Apply discount rules automatically
+    try {
+      const response = await axios.post(`${API_URL}/api/discount-rules/apply`, 
+        updatedCart, 
+        { params: { price_tier: selectedTier } }
+      );
+      setCart(response.data.items);
+    } catch (error) {
+      console.error('Error applying discounts:', error);
+      // If discount application fails, still add the item without discount
+      setCart(updatedCart);
     }
   };
 
