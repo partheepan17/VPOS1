@@ -1157,6 +1157,10 @@ function App() {
           <ReportsManagement language={language} getText={getText} />
         )}
 
+        {currentView === 'analytics' && (
+          <AdvancedReports language={language} getText={getText} />
+        )}
+
         {currentView === 'settings' && (
           <SettingsManagement language={language} getText={getText} />
         )}
