@@ -535,40 +535,65 @@ function ProductsManagement({ language, getText }) {
               </div>
 
               {/* Inventory */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Initial Stock</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="stock"
-                    value={formData.stock}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
-                  />
+              <div className="border-b border-gray-200 pb-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Inventory & Dates</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Initial Stock</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="stock"
+                      value={formData.stock}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Reorder Level</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="reorder_level"
+                      value={formData.reorder_level}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
+                    />
+                  </div>
+                  <div className="flex items-center pt-8">
+                    <input
+                      type="checkbox"
+                      name="weight_based"
+                      checked={formData.weight_based}
+                      onChange={handleInputChange}
+                      className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                    />
+                    <label className="ml-2 text-sm font-medium text-gray-700">
+                      Weight-based product
+                    </label>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Reorder Level</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="reorder_level"
-                    value={formData.reorder_level}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
-                  />
-                </div>
-                <div className="flex items-center pt-8">
-                  <input
-                    type="checkbox"
-                    name="weight_based"
-                    checked={formData.weight_based}
-                    onChange={handleInputChange}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                  />
-                  <label className="ml-2 text-sm font-medium text-gray-700">
-                    Weight-based product
-                  </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Packed Date</label>
+                    <input
+                      type="date"
+                      name="packed_date"
+                      value={formData.packed_date}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Expire Date</label>
+                    <input
+                      type="date"
+                      name="expire_date"
+                      value={formData.expire_date}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
+                    />
+                  </div>
                 </div>
               </div>
 
