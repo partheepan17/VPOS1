@@ -58,10 +58,16 @@ function App() {
   const [payments, setPayments] = useState([]);
   const [showSplitPayment, setShowSplitPayment] = useState(false);
 
+  // State for product search
+  const [productSearchTerm, setProductSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
   const barcodeInputRef = useRef(null);
   const scanBuffer = useRef('');
   const scanTimeout = useRef(null);
   const barcodeTimerRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   // Language translations
   const t = {
