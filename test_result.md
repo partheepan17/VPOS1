@@ -238,7 +238,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Label Printing Feature"
+    - "Invoice Language Testing"
+    - "Discount Rules Management"
+    - "POS System Integration"
+    - "Global Language Selector"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
