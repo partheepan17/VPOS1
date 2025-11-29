@@ -7,6 +7,7 @@ import CSVManagement from './CSVManagement';
 import InventoryManagement from './InventoryManagement';
 import ReportsManagement from './ReportsManagement';
 import SettingsManagement from './SettingsManagement';
+import TerminalManagement from './TerminalManagement';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
