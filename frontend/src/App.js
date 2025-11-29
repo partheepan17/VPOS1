@@ -16,6 +16,9 @@ import Dashboard from './Dashboard';
 import LabelPrinting from './LabelPrinting';
 import InvoicePrint from './InvoicePrint';
 import AdvancedReports from './AdvancedReports';
+import StockEntry from './StockEntry';
+import StockAdjustments from './StockAdjustments';
+import StockMovements from './StockMovements';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
