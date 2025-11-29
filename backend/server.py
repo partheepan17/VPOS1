@@ -324,6 +324,7 @@ def get_customer(customer_id: str):
 def create_customer(customer: Customer):
     customer_dict = customer.dict()
     customers_col.insert_one(customer_dict)
+    customer_dict.pop('_id', None)
     return {"message": "Customer created", "customer": customer_dict}
 
 @app.put("/api/customers/{customer_id}")
