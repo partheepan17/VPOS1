@@ -304,6 +304,100 @@ def health_check():
     except Exception as e:
         return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
 
+# ==================== AUTHENTICATION ====================
+
+@app.post("/api/auth/login")
+def login(user_login: UserLogin):
+    """Login endpoint - returns JWT token"""
+    user = users_col.find_one({"username": user_login.username}, {"_id": 0})
+    if not user or not verify_password(user_login.password, user["password"]):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    
+    if not user.get("active", True):
+        raise HTTPException(status_code=403, detail="User account is inactive")
+    
+    access_token = create_access_token(data={"sub": user["username"]})
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "full_name": user["full_name"],
+            "role": user["role"]
+        }
+    }
+
+@app.get("/api/auth/me")
+def get_current_user_info(current_user: dict = Depends(get_current_user)):
+    """Get current logged-in user information"""
+    return current_user
+
+@app.post("/api/auth/logout")
+def logout(current_user: dict = Depends(get_current_user)):
+    """Logout endpoint (client should discard token)"""
+    return {"message": "Logged out successfully"}
+
+# ==================== USER MANAGEMENT (Manager Only) ====================
+
+@app.get("/api/users")
+def get_users(current_user: dict = Depends(require_role(["manager"]))):
+    """Get all users (Manager only)"""
+    users = list(users_col.find({}, {"_id": 0, "password": 0}))
+    return {"users": users}
+
+@app.post("/api/users")
+def create_user(user: UserCreate, current_user: dict = Depends(require_role(["manager"]))):
+    """Create new user (Manager only)"""
+    existing = users_col.find_one({"username": user.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username already exists")
+    
+    if user.role not in ["manager", "cashier"]:
+        raise HTTPException(status_code=400, detail="Invalid role. Must be 'manager' or 'cashier'")
+    
+    new_user = {
+        "id": str(uuid.uuid4()),
+        "username": user.username,
+        "password": get_password_hash(user.password),
+        "full_name": user.full_name,
+        "role": user.role,
+        "active": True,
+        "created_at": datetime.utcnow().isoformat()
+    }
+    
+    users_col.insert_one(new_user)
+    new_user.pop('password')
+    
+    return {"message": "User created successfully", "user": new_user}
+
+@app.put("/api/users/{user_id}")
+def update_user(user_id: str, user_update: UserUpdate, current_user: dict = Depends(require_role(["manager"]))):
+    """Update user (Manager only)"""
+    update_data = {k: v for k, v in user_update.dict().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    result = users_col.update_one({"id": user_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User updated successfully"}
+
+@app.delete("/api/users/{user_id}")
+def deactivate_user(user_id: str, current_user: dict = Depends(require_role(["manager"]))):
+    """Deactivate user (Manager only)"""
+    if user_id == current_user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot deactivate your own account")
+    
+    result = users_col.update_one({"id": user_id}, {"$set": {"active": False}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User deactivated successfully"}
+
 # ==================== PRODUCTS ====================
 
 @app.get("/api/products")
