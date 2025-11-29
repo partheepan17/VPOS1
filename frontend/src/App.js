@@ -705,6 +705,17 @@ function App() {
                 >
                   Reports
                 </button>
+                <button
+                  onClick={() => setCurrentView('settings')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'settings'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                  data-testid="nav-settings"
+                >
+                  Settings
+                </button>
               </nav>
             </div>
           </div>
