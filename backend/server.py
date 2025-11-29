@@ -485,7 +485,7 @@ def get_sale(sale_id: str):
     return sale
 
 @app.post("/api/sales")
-def create_sale(sale: Sale):
+def create_sale(sale: Sale, allow_negative: bool = False, current_user: Dict = Depends(get_current_user)):
     # Generate invoice number if not provided
     if not sale.invoice_number:
         today = datetime.utcnow().strftime("%Y%m%d")
@@ -493,22 +493,50 @@ def create_sale(sale: Sale):
         sale.invoice_number = f"INV-{today}-{count + 1:04d}"
     
     sale_dict = sale.dict()
+    negative_stock_items = []
     
     # Update inventory for completed sales
     if sale.status == "completed":
         for item in sale.items:
-            product = products_col.find_one({"id": item.product_id})
+            product = products_col.find_one({"id": item.product_id}, {"_id": 0})
             if product:
                 previous_stock = product.get("stock", 0)
                 new_stock = previous_stock - item.quantity
                 
+                # Check for negative stock
+                if new_stock < 0 and not allow_negative:
+                    if current_user.get('role') != 'manager':
+                        negative_stock_items.append({
+                            "product_id": item.product_id,
+                            "name": product.get('name_en', ''),
+                            "current_stock": previous_stock,
+                            "required": item.quantity,
+                            "shortage": abs(new_stock)
+                        })
+                        continue
+                
                 # Update product stock
                 products_col.update_one(
                     {"id": item.product_id},
-                    {"$set": {"stock": new_stock}}
+                    {"$set": {
+                        "stock": new_stock,
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }}
                 )
                 
-                # Log inventory change
+                # Log stock movement using new system
+                log_stock_movement(
+                    product_id=item.product_id,
+                    movement_type="SALE",
+                    quantity=-item.quantity,
+                    reason=f"Sale {sale.invoice_number}",
+                    cost_price=product.get('weighted_avg_cost', 0),
+                    user_id=current_user['id'],
+                    reference_id=sale.invoice_number,
+                    notes=f"Sold by {sale.cashier_name}"
+                )
+                
+                # Also log in old system for backward compatibility
                 inventory_logs_col.insert_one({
                     "id": str(uuid.uuid4()),
                     "product_id": item.product_id,
@@ -521,6 +549,16 @@ def create_sale(sale: Sale):
                     "created_at": datetime.utcnow().isoformat(),
                     "created_by": sale.cashier_name
                 })
+    
+    # If there are negative stock items and user is not manager, return error
+    if negative_stock_items:
+        raise HTTPException(
+            status_code=400, 
+            detail={
+                "message": "Insufficient stock for some items. Manager override required.",
+                "negative_items": negative_stock_items
+            }
+        )
     
     sales_col.insert_one(sale_dict)
     # Remove MongoDB _id from response
