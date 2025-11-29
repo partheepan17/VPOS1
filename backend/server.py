@@ -564,6 +564,8 @@ def create_customer(customer: Customer):
 @app.put("/api/customers/{customer_id}")
 def update_customer(customer_id: str, customer: Customer):
     customer_dict = customer.dict()
+    # Ensure we don't overwrite the id field
+    customer_dict["id"] = customer_id
     result = customers_col.update_one({"id": customer_id}, {"$set": customer_dict})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Customer not found")
