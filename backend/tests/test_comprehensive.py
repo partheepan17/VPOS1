@@ -17,7 +17,7 @@ import sys
 import os
 
 # Use the production backend URL from frontend/.env
-BASE_URL = "https://quick-pos-15.preview.emergentagent.com/api"
+BASE_URL = "https://shopflow-119.preview.emergentagent.com/api"
 
 class Colors:
     GREEN = '\033[92m'
