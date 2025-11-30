@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """
-POS System Backend API Test Suite
-Tests Phase 6 completion features and MongoDB serialization fixes
+POS System Backend API Test Suite - Comprehensive Testing
+Tests all backend endpoints and business logic as per review request
+Focus: Authentication, Products, Discount Rules (RETAIL ONLY), Sales, Inventory, Reports
 """
 
 import requests
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
 
 # Use the production backend URL from frontend/.env
 BASE_URL = "https://shopflow-119.preview.emergentagent.com/api"
+
+# Global auth token for authenticated requests
+AUTH_TOKEN = None
 
 class Colors:
     GREEN = '\033[92m'
