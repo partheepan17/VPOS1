@@ -1163,6 +1163,16 @@ function App() {
                   📈 Analytics
                 </button>
                 <button
+                  onClick={() => setCurrentView('users')}
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                    currentView === 'users'
+                      ? 'bg-white text-green-600 shadow-md nav-button-active'
+                      : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-lg'
+                  }`}
+                >
+                  👥 Users
+                </button>
+                <button
                   onClick={() => setCurrentView('settings')}
                   className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'settings'
