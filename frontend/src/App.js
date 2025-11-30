@@ -1474,6 +1474,10 @@ function App() {
           <CustomersManagement language={language} getText={getText} />
         )}
 
+        {currentView === 'loyalty' && (
+          <LoyaltyManagement language={language} />
+        )}
+
         {currentView === 'discounts' && (
           <DiscountRules language={language} getText={getText} />
         )}
