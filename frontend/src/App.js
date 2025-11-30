@@ -721,6 +721,9 @@ function App() {
         }
       }
       
+      // Apply loyalty discount to total
+      const finalTotal = total - loyaltyDiscount;
+      
       const saleData = {
         invoice_number: '',
         customer_id: selectedCustomer?.id || null,
@@ -728,9 +731,9 @@ function App() {
         price_tier: selectedTier,
         items: cart,
         subtotal,
-        total_discount: totalDiscount,
+        total_discount: totalDiscount + loyaltyDiscount,
         tax_amount: 0,
-        total,
+        total: finalTotal,
         payments: paymentsToUse,
         status: 'completed',
         terminal_name: 'Terminal 1',
@@ -739,9 +742,28 @@ function App() {
       };
 
       const response = await axios.post(`${API_URL}/api/sales`, saleData);
-      setLastSale(response.data.sale);
+      const sale = response.data.sale;
+      setLastSale(sale);
+      
+      // Award loyalty points if customer is selected
+      if (selectedCustomer && selectedCustomer.id) {
+        try {
+          await axios.post(`${API_URL}/api/loyalty/award`, null, {
+            params: {
+              customer_id: selectedCustomer.id,
+              sale_total: finalTotal,
+              invoice_number: sale.invoice_number
+            }
+          });
+        } catch (loyaltyError) {
+          console.error('Failed to award loyalty points', loyaltyError);
+        }
+      }
+      
       setShowPaymentModal(false);
       setShowSplitPayment(false);
+      setLoyaltyPointsToRedeem(0);
+      setLoyaltyDiscount(0);
       clearCart();
       showNotification(
         stripePaymentIntent 
