@@ -1549,6 +1549,10 @@ function App() {
           <LoyaltyManagement language={language} />
         )}
 
+        {currentView === 'store-custom' && (
+          <StoreCustomization language={language} />
+        )}
+
         {currentView === 'discounts' && (
           <DiscountRules language={language} getText={getText} />
         )}
