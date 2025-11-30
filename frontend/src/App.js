@@ -62,6 +62,9 @@ function App() {
   const [showHeldBills, setShowHeldBills] = useState(false);
   const [payments, setPayments] = useState([]);
   const [showSplitPayment, setShowSplitPayment] = useState(false);
+  const [loyaltyPointsToRedeem, setLoyaltyPointsToRedeem] = useState(0);
+  const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
+  const [customerLoyaltyPoints, setCustomerLoyaltyPoints] = useState(0);
 
   // State for product search
   const [productSearchTerm, setProductSearchTerm] = useState('');
