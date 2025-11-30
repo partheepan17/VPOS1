@@ -1608,6 +1608,10 @@ function App() {
           <StoreCustomization language={language} />
         )}
 
+        {currentView === 'users' && (
+          <UserManagement language={language} />
+        )}
+
         {currentView === 'discounts' && (
           <DiscountRules language={language} getText={getText} />
         )}
