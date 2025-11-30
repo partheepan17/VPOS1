@@ -2034,6 +2034,27 @@ function App() {
               <p className="tamil-text">நன்றி!</p>
             </div>
 
+            {/* Email Receipt Section */}
+            <div className="print:hidden mb-4 border-t pt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">📧 Email Receipt</label>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={emailReceipt}
+                  onChange={(e) => setEmailReceipt(e.target.value)}
+                  placeholder="customer@email.com"
+                  className="flex-1 px-4 py-2 border rounded-lg text-sm"
+                />
+                <button
+                  onClick={handleSendEmailReceipt}
+                  disabled={sendingEmail || !emailReceipt}
+                  className="px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white rounded-lg font-medium text-sm transition"
+                >
+                  {sendingEmail ? 'Sending...' : 'Send'}
+                </button>
+              </div>
+            </div>
+
             <div className="flex gap-3 print:hidden">
               <button
                 onClick={printInvoice}
