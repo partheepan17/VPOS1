@@ -1763,14 +1763,26 @@ function App() {
                 </div>
 
                 <div className="bg-primary-50 rounded-lg p-4">
+                  {loyaltyDiscount > 0 && (
+                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                      <span>Subtotal:</span>
+                      <span>LKR {total.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {loyaltyDiscount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600 mb-2">
+                      <span>Loyalty Discount:</span>
+                      <span>-LKR {loyaltyDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-xl font-bold text-primary-700">
                     <span>{getText('total')}:</span>
-                    <span>LKR {total.toFixed(2)}</span>
+                    <span>LKR {(total - loyaltyDiscount).toFixed(2)}</span>
                   </div>
-                  {parseFloat(paymentAmount) > total && (
+                  {parseFloat(paymentAmount) > (total - loyaltyDiscount) && (
                     <div className="flex justify-between text-lg text-secondary-600 mt-2">
                       <span>Change:</span>
-                      <span>LKR {(parseFloat(paymentAmount) - total).toFixed(2)}</span>
+                      <span>LKR {(parseFloat(paymentAmount) - (total - loyaltyDiscount)).toFixed(2)}</span>
                     </div>
                   )}
                 </div>
