@@ -1129,6 +1129,16 @@ function App() {
                   ⚙️ {getText('settings')}
                 </button>
                 <button
+                  onClick={() => setCurrentView('store-custom')}
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                    currentView === 'store-custom'
+                      ? 'bg-white text-pink-600 shadow-md nav-button-active'
+                      : 'bg-pink-600 text-white hover:bg-pink-700 hover:shadow-lg'
+                  }`}
+                >
+                  🏪 Store
+                </button>
+                <button
                   onClick={() => setCurrentView('devices')}
                   className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'devices'
