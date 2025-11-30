@@ -33,11 +33,17 @@ try:
     from routes import backup_router, notification_router, device_router
     from routes.payment_routes import router as payment_router
     from routes.loyalty_routes import router as loyalty_router
+    from routes.store_routes import router as store_router
+    from routes.export_routes import router as export_router
+    from routes.email_routes import router as email_router
     app.include_router(backup_router)
     app.include_router(notification_router)
     app.include_router(device_router)
     app.include_router(payment_router)
     app.include_router(loyalty_router)
+    app.include_router(store_router)
+    app.include_router(export_router)
+    app.include_router(email_router)
     print("✅ Refactored routes loaded successfully")
 except Exception as e:
     print(f"⚠️  Failed to load refactored routes: {str(e)}")
