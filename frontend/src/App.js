@@ -15,6 +15,7 @@ import ProductsManagement from './ProductsManagement';
 import CustomersManagement from './CustomersManagement';
 import LoyaltyManagement from './LoyaltyManagement';
 import StoreCustomization from './StoreCustomization';
+import UserManagement from './UserManagement';
 import Dashboard from './Dashboard';
 import LabelPrinting from './LabelPrinting';
 import InvoicePrint from './InvoicePrint';
