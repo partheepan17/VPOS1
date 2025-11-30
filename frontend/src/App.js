@@ -13,6 +13,7 @@ import DeviceSettings from './DeviceSettings';
 import TerminalManagement from './TerminalManagement';
 import ProductsManagement from './ProductsManagement';
 import CustomersManagement from './CustomersManagement';
+import LoyaltyManagement from './LoyaltyManagement';
 import Dashboard from './Dashboard';
 import LabelPrinting from './LabelPrinting';
 import InvoicePrint from './InvoicePrint';
