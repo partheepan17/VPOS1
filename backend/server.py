@@ -541,7 +541,21 @@ def delete_discount_rule(rule_id: str):
 
 @app.post("/api/discount-rules/apply")
 def apply_discount_rules(cart_items: List[Dict], price_tier: str = "retail"):
-    """Apply auto-apply discount rules to cart items"""
+    """Apply auto-apply discount rules to cart items - ONLY for Retail tier"""
+    
+    # Check if discount rules should be applied
+    # Discounts only apply to retail tier, not wholesale/credit/other
+    if price_tier.lower() != "retail":
+        # For non-retail tiers, just reset discounts and return
+        for item in cart_items:
+            item['discount_amount'] = 0
+            item['discount_percent'] = 0
+            item['total'] = item['subtotal']
+            if 'applied_rule' in item:
+                del item['applied_rule']
+        return {"items": cart_items, "message": f"Discounts not applicable for {price_tier} tier"}
+    
+    # Proceed with discount application for retail tier only
     rules = list(discount_rules_col.find({"active": True, "auto_apply": True}, {"_id": 0}))
     
     for item in cart_items:
