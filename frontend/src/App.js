@@ -591,9 +591,20 @@ function App() {
     return { subtotal, totalDiscount, total };
   };
 
-  const handleCustomerSelect = (customer) => {
+  const handleCustomerSelect = async (customer) => {
     setSelectedCustomer(customer);
     setSelectedTier(customer.default_tier || 'retail');
+    
+    // Fetch customer loyalty points
+    if (customer.id) {
+      try {
+        const response = await axios.get(`${API_URL}/api/loyalty/customers/${customer.id}/points`);
+        setCustomerLoyaltyPoints(response.data.points_balance || 0);
+      } catch (error) {
+        console.error('Failed to fetch loyalty points', error);
+        setCustomerLoyaltyPoints(0);
+      }
+    }
     
     // Update cart prices based on tier
     const newCart = cart.map(item => {
