@@ -837,7 +837,8 @@ function App() {
       await axios.post(`${API_URL}/api/email/send-receipt`, {
         invoice_number: lastSale.invoice_number,
         recipient_email: emailReceipt,
-        customer_name: lastSale.customer_name
+        customer_name: lastSale.customer_name,
+        language: language  // Pass current language (en, si, ta)
       });
       showNotification(`Receipt sent to ${emailReceipt}!`, 'success');
       setEmailReceipt('');
