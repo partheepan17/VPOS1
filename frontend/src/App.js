@@ -14,6 +14,7 @@ import TerminalManagement from './TerminalManagement';
 import ProductsManagement from './ProductsManagement';
 import CustomersManagement from './CustomersManagement';
 import LoyaltyManagement from './LoyaltyManagement';
+import StoreCustomization from './StoreCustomization';
 import Dashboard from './Dashboard';
 import LabelPrinting from './LabelPrinting';
 import InvoicePrint from './InvoicePrint';
