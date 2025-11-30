@@ -1362,9 +1362,29 @@ function App() {
                       data-testid={`tier-${tier}`}
                     >
                       {getText(tier)}
+                      {tier === 'retail' && (
+                        <span className="ml-1 text-xs">🏷️</span>
+                      )}
                     </button>
                   ))}
                 </div>
+                
+                {/* Discount Rules Indicator */}
+                {selectedTier === 'retail' ? (
+                  <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-xs text-green-700 font-medium flex items-center gap-1">
+                      <span>✓</span>
+                      <span>Discount rules active</span>
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-3 p-2 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-xs text-gray-600 flex items-center gap-1">
+                      <span>ℹ️</span>
+                      <span>Discounts only apply to Retail tier</span>
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Totals */}
