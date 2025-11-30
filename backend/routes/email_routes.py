@@ -39,8 +39,16 @@ def get_email_settings():
     return settings
 
 
-def generate_receipt_html(sale, store_info):
+def generate_receipt_html(sale, store_info, language='en'):
     """Generate HTML email template for receipt"""
+    
+    def get_item_name(item):
+        """Get item name in selected language"""
+        if language == 'si' and item.get('name_si'):
+            return item.get('name_si')
+        elif language == 'ta' and item.get('name_ta'):
+            return item.get('name_ta')
+        return item.get('name_en') or item.get('name', 'Item')
     
     logo_html = ""
     if store_info.get('show_logo') and store_info.get('logo_base64'):
@@ -48,9 +56,10 @@ def generate_receipt_html(sale, store_info):
     
     items_html = ""
     for item in sale.get('items', []):
+        item_name = get_item_name(item)
         items_html += f"""
         <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">{item.get('name', 'Item')}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">{item_name}</td>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">{item.get('quantity', 0)}</td>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">LKR {item.get('unit_price', 0):.2f}</td>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">LKR {item.get('total', 0):.2f}</td>
