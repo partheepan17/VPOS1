@@ -926,6 +926,16 @@ function App() {
                   {getText('customers')}
                 </button>
                 <button
+                  onClick={() => setCurrentView('loyalty')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    currentView === 'loyalty'
+                      ? 'bg-white text-primary-600'
+                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  }`}
+                >
+                  🎁 Loyalty
+                </button>
+                <button
                   onClick={() => setCurrentView('discounts')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
                     currentView === 'discounts'
