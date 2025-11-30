@@ -154,7 +154,7 @@ async def send_receipt(request: SendReceiptRequest):
             raise HTTPException(status_code=404, detail="Invoice not found")
         
         # Generate email
-        html_content = generate_receipt_html(sale, email_settings)
+        html_content = generate_receipt_html(sale, email_settings, request.language)
         
         # Create message
         message = MIMEMultipart("alternative")
