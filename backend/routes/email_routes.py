@@ -28,6 +28,7 @@ class SendReceiptRequest(BaseModel):
     invoice_number: str
     recipient_email: EmailStr
     customer_name: Optional[str] = "Customer"
+    language: Optional[str] = "en"  # en, si, ta
 
 
 def get_email_settings():
