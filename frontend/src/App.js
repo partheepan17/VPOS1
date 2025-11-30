@@ -826,6 +826,47 @@ function App() {
     return item.name;
   };
 
+  const handleSendEmailReceipt = async () => {
+    if (!emailReceipt || !lastSale) {
+      showNotification('Please enter a valid email', 'error');
+      return;
+    }
+
+    setSendingEmail(true);
+    try {
+      await axios.post(`${API_URL}/api/email/send-receipt`, {
+        invoice_number: lastSale.invoice_number,
+        recipient_email: emailReceipt,
+        customer_name: lastSale.customer_name
+      });
+      showNotification(`Receipt sent to ${emailReceipt}!`, 'success');
+      setEmailReceipt('');
+    } catch (error) {
+      showNotification(error.response?.data?.detail || 'Failed to send email', 'error');
+    }
+    setSendingEmail(false);
+  };
+
+  const handleExportSales = async (format = 'csv') => {
+    try {
+      const response = await axios.get(`${API_URL}/api/export/sales/${format}`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `sales_report.${format}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      
+      showNotification('Report exported successfully!', 'success');
+    } catch (error) {
+      showNotification('Failed to export report', 'error');
+    }
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
