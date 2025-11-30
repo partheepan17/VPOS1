@@ -625,6 +625,30 @@ function App() {
     setCart(newCart);
   };
 
+  const handleRedeemPoints = async (points) => {
+    if (!selectedCustomer || !selectedCustomer.id) {
+      showNotification('Please select a customer first', 'error');
+      return;
+    }
+
+    const { total } = calculateTotals();
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/loyalty/redeem`, {
+        customer_id: selectedCustomer.id,
+        points: points,
+        sale_total: total
+      });
+      
+      setLoyaltyPointsToRedeem(response.data.points_redeemed);
+      setLoyaltyDiscount(response.data.discount_amount);
+      setCustomerLoyaltyPoints(response.data.new_balance);
+      showNotification(`Redeemed ${response.data.points_redeemed} points for LKR ${response.data.discount_amount.toFixed(2)} discount!`, 'success');
+    } catch (error) {
+      showNotification(error.response?.data?.detail || 'Failed to redeem points', 'error');
+    }
+  };
+
   const openPaymentModal = () => {
     if (cart.length === 0) {
       showNotification('Cart is empty!', 'error');
