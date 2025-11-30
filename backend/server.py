@@ -32,10 +32,12 @@ app.add_middleware(
 try:
     from routes import backup_router, notification_router, device_router
     from routes.payment_routes import router as payment_router
+    from routes.loyalty_routes import router as loyalty_router
     app.include_router(backup_router)
     app.include_router(notification_router)
     app.include_router(device_router)
     app.include_router(payment_router)
+    app.include_router(loyalty_router)
     print("✅ Refactored routes loaded successfully")
 except Exception as e:
     print(f"⚠️  Failed to load refactored routes: {str(e)}")
