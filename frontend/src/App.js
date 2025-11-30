@@ -1689,6 +1689,43 @@ function App() {
             {!showSplitPayment ? (
               /* Single Payment Mode */
               <div className="space-y-4">
+                {/* Loyalty Points Section */}
+                {selectedCustomer && selectedCustomer.id && customerLoyaltyPoints > 0 && (
+                  <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-300 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <div>
+                        <div className="text-sm font-semibold text-gray-700">🎁 Loyalty Points</div>
+                        <div className="text-2xl font-bold text-yellow-600">{customerLoyaltyPoints.toFixed(0)} points</div>
+                      </div>
+                      {loyaltyDiscount > 0 && (
+                        <div className="text-right">
+                          <div className="text-sm text-gray-600">Discount Applied</div>
+                          <div className="text-lg font-bold text-green-600">-LKR {loyaltyDiscount.toFixed(2)}</div>
+                        </div>
+                      )}
+                    </div>
+                    {loyaltyDiscount === 0 && (
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          placeholder="Points to redeem"
+                          className="flex-1 px-3 py-2 border rounded-lg text-sm"
+                          id="loyalty-redeem-input"
+                        />
+                        <button
+                          onClick={() => {
+                            const points = parseInt(document.getElementById('loyalty-redeem-input').value);
+                            if (points > 0) handleRedeemPoints(points);
+                          }}
+                          className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium text-sm"
+                        >
+                          Redeem
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {getText('paymentMethod')}
