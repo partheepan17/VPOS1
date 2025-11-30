@@ -3,8 +3,9 @@ import os
 
 # Database connection
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/')
+DATABASE_NAME = os.environ.get('DATABASE_NAME', 'pos_system')
 client = MongoClient(MONGO_URL, maxPoolSize=50, minPoolSize=10)
-db = client['pos_system']
+db = client[DATABASE_NAME]
 
 print(f"✅ MongoDB connected successfully to {db.name}")
 
