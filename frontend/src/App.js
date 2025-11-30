@@ -66,6 +66,8 @@ function App() {
   const [loyaltyPointsToRedeem, setLoyaltyPointsToRedeem] = useState(0);
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
   const [customerLoyaltyPoints, setCustomerLoyaltyPoints] = useState(0);
+  const [emailReceipt, setEmailReceipt] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   // State for product search
   const [productSearchTerm, setProductSearchTerm] = useState('');
