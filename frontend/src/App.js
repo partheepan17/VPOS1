@@ -2144,6 +2144,7 @@ function App() {
               <h2 className="text-3xl font-bold text-center text-primary-600 mb-2">
                 {getText('invoice')}
               </h2>
+              {/* Store header always in English */}
               <div className="text-center text-gray-600">
                 <p className="font-semibold">My Grocery Store</p>
                 <p className="text-sm">123 Main Street, Colombo</p>
