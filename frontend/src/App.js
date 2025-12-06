@@ -1863,16 +1863,21 @@ function App() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {getText('amount')}
+                    {getText('amount')} <span className="text-xs text-gray-500">(Edit if paying different amount)</span>
                   </label>
                   <input
                     type="number"
                     step="0.01"
                     value={paymentAmount}
                     onChange={(e) => setPaymentAmount(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 text-lg"
+                    onFocus={(e) => e.target.select()}
+                    className="w-full px-4 py-3 border-2 border-primary-300 rounded-lg focus:outline-none focus:border-primary-500 text-lg font-semibold bg-primary-50"
                     data-testid="payment-amount"
+                    placeholder={(total - loyaltyDiscount).toFixed(2)}
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    💡 Amount is pre-filled with exact total. Change only if customer pays more (for change).
+                  </p>
                 </div>
 
                 <div className="bg-primary-50 rounded-lg p-4">
