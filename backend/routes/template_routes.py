@@ -3,7 +3,7 @@ from typing import List
 from datetime import datetime, timezone
 from uuid import uuid4
 from models.sale_template import SaleTemplate, SaleTemplateCreate, SaleTemplateUpdate
-from utils.database import get_database
+from utils.database import db
 
 router = APIRouter()
 
