@@ -782,7 +782,14 @@ function App() {
         notes: stripePaymentIntent ? `Stripe Payment: ${stripePaymentIntent.payment_intent_id}` : ''
       };
 
+      console.log('Sending sale data to backend:', {
+        total: saleData.total,
+        items: saleData.items.length,
+        payment_method: paymentsToUse[0].method
+      });
+
       const response = await axios.post(`${API_URL}/api/sales`, saleData);
+      console.log('Sale created successfully:', response.data.sale?.invoice_number);
       const sale = response.data.sale;
       setLastSale(sale);
       
