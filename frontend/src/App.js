@@ -1972,6 +1972,10 @@ function App() {
           <TerminalManagement language={language} getText={getText} />
         )}
 
+        {currentView === 'templates' && (
+          <TemplateManagement language={language} getText={getText} />
+        )}
+
         {currentView === 'sales' && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-6">
