@@ -1819,13 +1819,10 @@ function App() {
 
                 {lastSale && (
                   <button
-                    onClick={() => {
-                      printInvoice();
-                      showNotification('Printing last invoice...', 'success');
-                    }}
+                    onClick={handlePrintLastInvoice}
                     className="w-full mt-3 px-6 py-3 bg-green-500 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition btn-press flex items-center justify-center gap-2"
                   >
-                    🖨️ Print Last Invoice <span className="text-sm opacity-90">(Ctrl+P)</span>
+                    🖨️ Reprint Last Invoice <span className="text-sm opacity-90">(F9)</span>
                   </button>
                 )}
               </div>
