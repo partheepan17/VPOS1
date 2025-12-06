@@ -376,15 +376,34 @@ function App() {
   };
 
   const handleBarcodeScanned = async (barcode) => {
+    if (!barcode || !barcode.trim()) {
+      return;
+    }
+    
     try {
-      const response = await axios.get(`${API_URL}/api/products/barcode/${barcode}`);
+      const response = await axios.get(`${API_URL}/api/products/barcode/${barcode.trim()}`);
       const product = response.data;
-      addToCart(product);
+      await addToCart(product);
       showNotification(`Added: ${product.name_en}`, 'success');
       setBarcodeInput('');
+      
+      // Focus back to barcode input after adding
+      setTimeout(() => {
+        if (barcodeInputRef.current) {
+          barcodeInputRef.current.focus();
+        }
+      }, 100);
     } catch (error) {
+      console.error('Barcode scan error:', error);
       showNotification('Product not found!', 'error');
       setBarcodeInput('');
+      
+      // Focus back to barcode input even on error
+      setTimeout(() => {
+        if (barcodeInputRef.current) {
+          barcodeInputRef.current.focus();
+        }
+      }, 100);
     }
   };
 
