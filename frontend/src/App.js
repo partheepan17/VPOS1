@@ -692,6 +692,116 @@ function App() {
     setShowPaymentModal(true);
   };
 
+  // FAST PRINT FUNCTION - For high-volume shops, prints in background without modal delays
+  // MUST BE DEFINED BEFORE processPayment to avoid hoisting issues
+  const fastPrintInvoice = (sale) => {
+    if (!sale) return;
+    
+    const printFrame = document.createElement('iframe');
+    printFrame.style.display = 'none';
+    document.body.appendChild(printFrame);
+    
+    const printDoc = printFrame.contentWindow.document;
+    printDoc.open();
+    printDoc.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Invoice ${sale.invoice_number}</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; max-width: 300px; margin: 0; }
+          .header { text-align: center; margin-bottom: 20px; }
+          .header h2 { margin: 0; font-size: 24px; }
+          .header p { margin: 2px 0; font-size: 12px; }
+          .details { border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 10px 0; margin: 10px 0; }
+          .details p { margin: 3px 0; font-size: 12px; }
+          table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px; }
+          th { background: #f0f0f0; padding: 5px 3px; text-align: left; border-bottom: 1px solid #000; font-size: 10px; }
+          td { padding: 5px 3px; border-bottom: 1px dotted #ccc; }
+          .text-right { text-align: right; }
+          .totals { margin-top: 10px; font-size: 12px; }
+          .totals div { display: flex; justify-content: space-between; padding: 3px 0; }
+          .grand-total { font-weight: bold; font-size: 16px; border-top: 2px solid #000; padding-top: 5px; margin-top: 5px; }
+          .footer { text-align: center; margin-top: 20px; font-size: 12px; }
+          .sinhala { font-family: 'Noto Sans Sinhala', Arial, sans-serif; }
+          .tamil { font-family: 'Noto Sans Tamil', Arial, sans-serif; }
+          @media print {
+            body { margin: 0; padding: 10px; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h2>INVOICE</h2>
+          <p><strong>My Grocery Store</strong></p>
+          <p>123 Main Street, Colombo</p>
+          <p>Tel: 0112345678</p>
+        </div>
+        
+        <div class="details">
+          <p><strong>Invoice No:</strong> ${sale.invoice_number}</p>
+          <p><strong>Date:</strong> ${new Date(sale.created_at).toLocaleString()}</p>
+          <p><strong>Customer:</strong> ${sale.customer_name}</p>
+          <p><strong>Terminal:</strong> ${sale.terminal_name}</p>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Price</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sale.items.map(item => {
+              const productName = language === 'si' && item.name_si ? item.name_si : 
+                                language === 'ta' && item.name_ta ? item.name_ta : 
+                                item.name;
+              return `
+                <tr>
+                  <td class="${language === 'si' ? 'sinhala' : language === 'ta' ? 'tamil' : ''}">${productName}</td>
+                  <td class="text-right">${item.quantity}</td>
+                  <td class="text-right">${item.unit_price.toFixed(2)}</td>
+                  <td class="text-right">${item.total.toFixed(2)}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        
+        <div class="totals">
+          <div><span>Subtotal:</span><span>LKR ${sale.subtotal.toFixed(2)}</span></div>
+          <div class="${language === 'si' ? 'sinhala' : language === 'ta' ? 'tamil' : ''}" style="color: #dc2626;">
+            <span>${language === 'si' ? 'මුළු වට්ටම:' : language === 'ta' ? 'மொத்த தள்ளுபடி:' : 'Total Discount:'}</span>
+            <span>- LKR ${sale.total_discount.toFixed(2)}</span>
+          </div>
+          <div class="grand-total"><span>Grand Total:</span><span>LKR ${sale.total.toFixed(2)}</span></div>
+        </div>
+        
+        <div class="footer ${language === 'si' ? 'sinhala' : language === 'ta' ? 'tamil' : ''}">
+          ${language === 'en' ? '<p>Thank you for your business!</p>' : 
+            language === 'si' ? '<p>ස්තූතියි!</p>' : 
+            '<p>நன்றி!</p>'}
+        </div>
+      </body>
+      </html>
+    `);
+    printDoc.close();
+    
+    // Print and clean up
+    setTimeout(() => {
+      printFrame.contentWindow.focus();
+      printFrame.contentWindow.print();
+      setTimeout(() => {
+        if (document.body.contains(printFrame)) {
+          document.body.removeChild(printFrame);
+        }
+      }, 1000);
+    }, 100);
+  };
+
   const processPayment = async () => {
     console.log('=== PAYMENT PROCESS START ===');
     const { total } = calculateTotals();
