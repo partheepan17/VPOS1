@@ -1312,36 +1312,41 @@ function App() {
                 </button>
                 <button
                   onClick={() => setCurrentView('loyalty')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'loyalty'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                 >
                   🎁 Loyalty
                 </button>
                 <button
                   onClick={() => setCurrentView('discounts')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'discounts'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-discounts"
                 >
-                  {getText('discounts')}
+                  🏷️ {getText('discounts')}
                 </button>
                 <button
                   onClick={() => setCurrentView('prices')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'prices'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-prices"
                 >
-                  {getText('prices')}
+                  💵 {getText('prices')}
                 </button>
+                
+                {/* Divider */}
+                <div className="h-6 w-px bg-white bg-opacity-30"></div>
+                
+                {/* DATA & REPORTS */}
                 <button
                   onClick={() => setCurrentView('csv')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
