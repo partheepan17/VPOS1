@@ -79,8 +79,57 @@ function LabelPrinting({ language, getText }) {
       showNotification('Please select at least one product to print labels', 'error');
       return;
     }
-    window.print();
-    showNotification(`Printing ${selectedProducts.length} labels`, 'success');
+    
+    if (useThermalPrinter) {
+      handleThermalPrint();
+    } else {
+      window.print();
+      showNotification(`Printing ${selectedProducts.length} labels`, 'success');
+    }
+  };
+
+  const handleThermalPrint = async () => {
+    try {
+      const selectedProductsData = products.filter(p => selectedProducts.includes(p.id));
+      
+      showNotification('Generating thermal labels...', 'success');
+      
+      // Generate labels for each product using backend API
+      for (const product of selectedProductsData) {
+        const barcode = product.barcodes.length > 0 ? product.barcodes[0] : product.sku;
+        
+        // Open label in new tab for printing
+        const response = await axios.post(
+          `${API_URL}/api/barcode/generate-label`,
+          {
+            code: barcode,
+            product_name: product.name_en,
+            price: product.price_retail,
+            format: barcodeType === 'QR' ? 'CODE128' : barcodeType
+          },
+          { responseType: 'blob' }
+        );
+        
+        // Create blob URL and open in new tab
+        const blob = new Blob([response.data], { type: 'image/png' });
+        const url = window.URL.createObjectURL(blob);
+        const printWindow = window.open(url, '_blank');
+        
+        if (printWindow) {
+          printWindow.onload = () => {
+            printWindow.print();
+          };
+        }
+        
+        // Small delay between prints
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      showNotification(`Sent ${selectedProductsData.length} labels to printer`, 'success');
+    } catch (error) {
+      console.error('Error printing thermal labels:', error);
+      showNotification('Failed to generate thermal labels', 'error');
+    }
   };
 
   const handleGeneratePDF = async () => {
