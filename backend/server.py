@@ -5,7 +5,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 import os
@@ -891,7 +891,7 @@ def get_low_stock_products(current_user: Dict = Depends(get_current_user)):
 @app.get("/api/products/expiring-soon")
 def get_expiring_products(days: int = 30, current_user: Dict = Depends(get_current_user)):
     """Get products with batches expiring soon"""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
     cutoff_date = (datetime.now(timezone.utc) + timedelta(days=days)).isoformat()
     
@@ -919,7 +919,7 @@ def get_expiring_products(days: int = 30, current_user: Dict = Depends(get_curre
 @app.get("/api/reports/sales-trends")
 def get_sales_trends(period: str = "daily", days: int = 30):
     """Get sales trends over time (daily, weekly, monthly)"""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
     end_date = datetime.utcnow()
     start_date = end_date - timedelta(days=days)
@@ -953,7 +953,7 @@ def get_sales_trends(period: str = "daily", days: int = 30):
 @app.get("/api/reports/top-products")
 def get_top_products(limit: int = 10, days: int = 30):
     """Get top selling products"""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
     end_date = datetime.utcnow()
     start_date = end_date - timedelta(days=days)
@@ -986,7 +986,7 @@ def get_top_products(limit: int = 10, days: int = 30):
 @app.get("/api/reports/sales-by-cashier")
 def get_sales_by_cashier(days: int = 30):
     """Get sales performance by cashier"""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
     end_date = datetime.utcnow()
     start_date = end_date - timedelta(days=days)
@@ -1019,7 +1019,7 @@ def get_sales_by_cashier(days: int = 30):
 @app.get("/api/reports/profit-analysis")
 def get_profit_analysis(days: int = 30):
     """Analyze profit margins (simplified - assumes cost is 70% of retail price)"""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
     end_date = datetime.utcnow()
     start_date = end_date - timedelta(days=days)
@@ -1046,7 +1046,7 @@ def get_profit_analysis(days: int = 30):
 @app.get("/api/reports/customer-insights")
 def get_customer_insights(days: int = 30):
     """Get customer purchase insights"""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
     end_date = datetime.utcnow()
     start_date = end_date - timedelta(days=days)
@@ -1298,7 +1298,7 @@ def get_discount_usage(start_date: str = "", end_date: str = ""):
 @app.get("/api/reports/daily-sales")
 def get_daily_sales(days: int = 7):
     """Get daily sales for the last N days"""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
     end_date = datetime.utcnow()
     start_date = end_date - timedelta(days=days)
