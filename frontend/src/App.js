@@ -1714,6 +1714,10 @@ function App() {
           <UserManagement language={language} />
         )}
 
+        {currentView === 'features' && (
+          <FeatureManagement language={language} />
+        )}
+
         {currentView === 'discounts' && (
           <DiscountRules language={language} getText={getText} />
         )}
