@@ -37,6 +37,7 @@ try:
     from routes.export_routes import router as export_router
     from routes.email_routes import router as email_router
     from routes.system_routes import router as system_router
+    from routes.barcode_routes import router as barcode_router
     app.include_router(backup_router)
     app.include_router(notification_router)
     app.include_router(device_router)
@@ -46,6 +47,7 @@ try:
     app.include_router(export_router)
     app.include_router(email_router)
     app.include_router(system_router)
+    app.include_router(barcode_router, prefix="/api/barcode", tags=["Barcode"])
     print("✅ Refactored routes loaded successfully")
 except Exception as e:
     print(f"⚠️  Failed to load refactored routes: {str(e)}")
