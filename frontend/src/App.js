@@ -820,6 +820,12 @@ function App() {
         'success'
       );
       setShowInvoice(true);
+      
+      // Auto-print invoice after payment confirmation
+      setTimeout(() => {
+        window.print();
+      }, 500);
+      
       fetchSalesHistory();
     } catch (error) {
       console.error('=== PAYMENT ERROR ===');
