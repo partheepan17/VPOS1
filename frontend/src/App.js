@@ -1395,10 +1395,24 @@ function App() {
                 </div>
                 
                 {/* Search Tips */}
-                <div className="mt-3 text-sm text-gray-600">
-                  <span className="font-medium">Search by:</span> Product Name (සිංහල/தமිழ්/English) · SKU · Product ID
-                  <br />
-                  <span className="font-medium">Tip:</span> Press <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Enter</kbd> to add first result to cart
+                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="text-sm text-gray-700">
+                    <span className="font-semibold">⌨️ Keyboard Shortcuts:</span>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <div>
+                        <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">F2</kbd> Pay
+                      </div>
+                      <div>
+                        <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">F4</kbd> Focus Barcode
+                      </div>
+                      <div>
+                        <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">Ctrl+P</kbd> Print Last Invoice
+                      </div>
+                      <div>
+                        <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">Enter</kbd> Add First Result
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
