@@ -388,6 +388,13 @@ def create_sale(sale: Sale, allow_negative: bool = False, current_user: Dict = D
     sale_dict = sale.dict()
     negative_stock_items = []
     
+    # Get system settings for negative stock allowance
+    system_settings = db['system_settings'].find_one({}, {"_id": 0})
+    allow_negative_from_settings = system_settings.get('allow_negative_stock', False) if system_settings else False
+    
+    # Allow negative stock if either: system setting is enabled OR allow_negative param is True
+    allow_negative_stock = allow_negative or allow_negative_from_settings
+    
     # Update inventory for completed sales
     if sale.status == "completed":
         for item in sale.items:
@@ -397,7 +404,7 @@ def create_sale(sale: Sale, allow_negative: bool = False, current_user: Dict = D
                 new_stock = previous_stock - item.quantity
                 
                 # Check for negative stock
-                if new_stock < 0 and not allow_negative:
+                if new_stock < 0 and not allow_negative_stock:
                     if current_user.get('role') != 'manager':
                         negative_stock_items.append({
                             "product_id": item.product_id,
