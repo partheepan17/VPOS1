@@ -807,7 +807,29 @@ function App() {
       fetchSalesHistory();
     } catch (error) {
       console.error('Payment error:', error);
-      showNotification('Payment failed!', 'error');
+      
+      // Handle specific error types
+      if (error.response?.data?.detail) {
+        const detail = error.response.data.detail;
+        
+        // Handle insufficient stock error
+        if (detail.message && detail.message.includes('Insufficient stock')) {
+          const items = detail.negative_items || [];
+          let errorMsg = 'Insufficient stock!\n\n';
+          items.forEach(item => {
+            errorMsg += `${item.name}: Need ${item.required}, Have ${item.current_stock}\n`;
+          });
+          errorMsg += '\nPlease update stock or remove items from cart.';
+          alert(errorMsg);
+          showNotification('Insufficient stock! Check inventory.', 'error');
+        } else {
+          // Other backend errors
+          showNotification(detail.message || detail || 'Payment failed!', 'error');
+        }
+      } else {
+        // Generic error
+        showNotification('Payment failed! Please try again.', 'error');
+      }
     }
     setLoading(false);
   };
