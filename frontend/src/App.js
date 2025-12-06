@@ -1348,27 +1348,65 @@ function App() {
                 
                 {/* DATA & REPORTS */}
                 <button
+                  onClick={() => setCurrentView('reports')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'reports'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                  data-testid="nav-reports"
+                >
+                  📈 {getText('reports')}
+                </button>
+                <button
+                  onClick={() => setCurrentView('analytics')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'analytics'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                  data-testid="nav-analytics"
+                >
+                  📊 Analytics
+                </button>
+                <button
+                  onClick={() => setCurrentView('invoices')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'invoices'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                  data-testid="nav-invoices"
+                >
+                  🧾 {getText('invoices')}
+                </button>
+                <button
                   onClick={() => setCurrentView('csv')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'csv'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-csv"
                 >
-                  {getText('csv')}
+                  📄 {getText('csv')}
                 </button>
                 <button
                   onClick={() => setCurrentView('labels')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'labels'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-labels"
                 >
-                  {getText('labels')}
+                  🔖 {getText('labels')}
                 </button>
+                
+                {/* Divider */}
+                <div className="h-6 w-px bg-white bg-opacity-30"></div>
+                
+                {/* SYSTEM & SETTINGS */}
                 <button
                   onClick={() => setCurrentView('stock-entry')}
                   className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
