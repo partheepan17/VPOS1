@@ -693,7 +693,12 @@ function App() {
   };
 
   const processPayment = async () => {
+    console.log('=== PAYMENT PROCESS START ===');
     const { total } = calculateTotals();
+    console.log('Total amount:', total);
+    console.log('Payment method:', paymentMethod);
+    console.log('Payment amount:', paymentAmount);
+    console.log('Cart items:', cart.length);
     
     // For split payment mode
     if (showSplitPayment) {
@@ -707,6 +712,7 @@ function App() {
     setLoading(true);
     try {
       const { subtotal, totalDiscount } = calculateTotals();
+      console.log('Subtotal:', subtotal, 'Discount:', totalDiscount);
       
       // Use split payments if available, otherwise single payment
       const paymentsToUse = showSplitPayment && payments.length > 0 
