@@ -1481,70 +1481,7 @@ function App() {
                 >
                   📊 {getText('stockMovements')}
                 </button>
-                <button
-                  onClick={() => setCurrentView('invoices')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
-                    currentView === 'invoices'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
-                  }`}
-                  data-testid="nav-invoices"
-                >
-                  {getText('invoices')}
-                </button>
-                <button
-                  onClick={() => setCurrentView('reports')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                    currentView === 'reports'
-                      ? 'bg-white text-indigo-600 shadow-md nav-button-active'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg'
-                  }`}
-                  data-testid="nav-reports"
-                >
-                  📊 {getText('reports')}
-                </button>
-                <button
-                  onClick={() => setCurrentView('analytics')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                    currentView === 'analytics'
-                      ? 'bg-white text-purple-600 shadow-md nav-button-active'
-                      : 'bg-purple-600 text-white hover:bg-purple-700 hover:shadow-lg'
-                  }`}
-                  data-testid="nav-analytics"
-                >
-                  📈 Analytics
-                </button>
-                <button
-                  onClick={() => setCurrentView('users')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                    currentView === 'users'
-                      ? 'bg-white text-green-600 shadow-md nav-button-active'
-                      : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-lg'
-                  }`}
-                >
-                  👥 Users
-                </button>
-                <button
-                  onClick={() => setCurrentView('features')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                    currentView === 'features'
-                      ? 'bg-white text-indigo-600 shadow-md nav-button-active'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg'
-                  }`}
-                >
-                  🎛️ Features
-                </button>
-                <button
-                  onClick={() => setCurrentView('settings')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                    currentView === 'settings'
-                      ? 'bg-white text-amber-600 shadow-md nav-button-active'
-                      : 'bg-amber-600 text-white hover:bg-amber-700 hover:shadow-lg'
-                  }`}
-                  data-testid="nav-settings"
-                >
-                  ⚙️ {getText('settings')}
-                </button>
+ 
                 <button
                   onClick={() => setCurrentView('store-custom')}
                   className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
