@@ -211,9 +211,9 @@ frontend:
 
   - task: "POS System Integration"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -225,7 +225,10 @@ frontend:
         comment: "✓ COMPREHENSIVE DISCOUNT RULE APPLICATION TESTING COMPLETE - Successfully tested all discount scenarios: 1) Rice product (5% discount for qty ≥10) ✓, 2) Sugar product (LKR 50/20% discount for qty ≥20) ✓, 3) General line item discount (2% for qty ≥5) ✓. Auto-apply functionality working correctly ✓. Discount rules properly configured (3 rules with auto-apply enabled) ✓. Cart totals calculating correctly with discounts ✓. Payment processing with discounted items working ✓. Invoice generation includes discount information ✓. All test scenarios from review request successfully validated."
       - working: true
         agent: "testing"
-        comment: "✓ COMPREHENSIVE PRODUCT SEARCH FUNCTIONALITY TESTING COMPLETE - All 10 test scenarios successfully validated: 1) English product search (Rice) ✓, 2) Sinhala language search (සහල්) ✓, 3) Tamil language search (அரிசி) ✓, 4) SKU search (RICE-001) ✓, 5) Search results display (product name, SKU, category, stock, price, hover effects) ✓, 6) Search dropdown behavior (2+ char minimum, click outside to close) ✓, 7) Multi-product search and cart management ✓, 8) Price tier integration (wholesale pricing in results) ✓, 9) Search tips and UI elements ✓, 10) Search input clearing after selection ✓. Minor: No results scenario message not displayed for non-existent products, search tips partially incomplete. All core product search functionality working perfectly with multi-language support and proper integration with cart, pricing tiers, and barcode scanning."
+        comment: "✓ COMPREHENSIVE PRODUCT SEARCH FUNCTIONALITY TESTING COMPLETE - All 10 test scenarios successfully validated: 1) English product search (Rice) ✓, 2) Sinhala language search (සහල්) ✓, 3) Tamil language search (அරිசි) ✓, 4) SKU search (RICE-001) ✓, 5) Search results display (product name, SKU, category, stock, price, hover effects) ✓, 6) Search dropdown behavior (2+ char minimum, click outside to close) ✓, 7) Multi-product search and cart management ✓, 8) Price tier integration (wholesale pricing in results) ✓, 9) Search tips and UI elements ✓, 10) Search input clearing after selection ✓. Minor: No results scenario message not displayed for non-existent products, search tips partially incomplete. All core product search functionality working perfectly with multi-language support and proper integration with cart, pricing tiers, and barcode scanning."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL HIGH-SPEED POS FLOW FAILURES - Comprehensive testing of high-speed POS flow for busy retail shops (500+ products, customer queues) reveals MAJOR BLOCKING ISSUES: 1) ❌ Payment modal does NOT close immediately after confirmation - remains visible blocking workflow, 2) ❌ Cart does NOT clear automatically after payment - items remain requiring manual clearing, 3) ❌ Processing time EXCEEDS 2-second target (4.21s measured), 4) ❌ System NOT ready for next customer - barcode input not focused, 5) ❌ Modal overlay issues preventing proper interaction, 6) ❌ F9 reprint function not working - no notification or print action. POSITIVE: Login (admin/admin1234) ✓, POS navigation ✓, Sinhala language selection ✓, Sample data loading ✓, Barcode product addition ✓, F2 payment modal opening ✓. The high-speed mode implementation (lines 811-832 in App.js) is NOT functioning as designed for busy retail environments. Requires immediate fix for production readiness."
 
   - task: "Global Language Selector"
     implemented: true
