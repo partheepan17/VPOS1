@@ -1262,15 +1262,53 @@ function App() {
                   📦 {getText('products')}
                 </button>
                 <button
+                  onClick={() => setCurrentView('stock-entry')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'stock-entry'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                  data-testid="nav-stock-entry"
+                >
+                  📥 {getText('stockEntry')}
+                </button>
+                <button
+                  onClick={() => setCurrentView('stock-adjustments')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'stock-adjustments'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                  data-testid="nav-stock-adjustments"
+                >
+                  📝 {getText('stockAdjustments')}
+                </button>
+                <button
+                  onClick={() => setCurrentView('inventory')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'inventory'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                  data-testid="nav-inventory"
+                >
+                  📋 {getText('inventory')}
+                </button>
+                
+                {/* Divider */}
+                <div className="h-6 w-px bg-white bg-opacity-30"></div>
+                
+                {/* CUSTOMERS & SALES */}
+                <button
                   onClick={() => setCurrentView('customers')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'customers'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-customers"
                 >
-                  {getText('customers')}
+                  👥 {getText('customers')}
                 </button>
                 <button
                   onClick={() => setCurrentView('loyalty')}
