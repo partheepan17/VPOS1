@@ -237,6 +237,9 @@ function App() {
       setIsAuthenticated(true);
       setCurrentUser(JSON.parse(user));
     }
+    
+    // Fetch templates on mount
+    fetchTemplates();
   }, []);
 
   // Authentication handlers
