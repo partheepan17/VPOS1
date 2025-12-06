@@ -193,6 +193,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✓ COMPREHENSIVE INVOICE LANGUAGE TESTING COMPLETE - Language selector present and working ✓, All three language options available (Sinhala/Tamil/English) ✓, Language switching mechanism functional ✓, Default language is Sinhala ✓, Product names display correctly in selected language ✓, Print functionality working ✓, Search functionality operational ✓. All invoice printing with language options fully functional."
+      - working: true
+        agent: "testing"
+        comment: "✓ ENHANCED INVOICE PRINTING FUNCTIONALITY TESTING COMPLETE - All 7 requirements from review request successfully validated: 1) Store header in English (hardcoded) ✓ - 'My Grocery Store', '123 Main Street, Colombo', 'Tel: 0112345678' correctly displayed, 2) Product names in selected language using getProductName function ✓ - 'Basmati Rice 5kg' and 'White Sugar 1kg' displayed correctly, 3) Labels translated using getText function ✓ - Sinhala labels 'ඉන්වොයිසිය', 'උප එකතුව', 'මුළු එකතුව' working, 4) Thank you footer in selected language only ✓ - Single language display (Sinhala), 5) Auto-print after payment confirmation ✓ - setTimeout(() => window.print(), 500) implemented and working, 6) Preview Invoice button (blue, eye icon) ✓ - Button found with correct styling and 👁️ icon, 7) Print & Close button (green, printer icon) ✓ - Button found with 🖨️ icon. Invoice modal appears automatically after payment, all functionality working perfectly. Invoice structure verified: INV- number format, LKR 1750.00 total, Walk-in customer display all correct."
 
   - task: "Discount Rules Management"
     implemented: true
