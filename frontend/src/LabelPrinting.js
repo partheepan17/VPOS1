@@ -293,7 +293,7 @@ function LabelPrinting({ language, getText }) {
       <div className="bg-white rounded-lg shadow-md p-6 no-print">
         <h3 className="text-lg font-bold text-gray-800 mb-4">Label Settings</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Barcode Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Barcode Type</label>
@@ -323,6 +323,31 @@ function LabelPrinting({ language, getText }) {
             </select>
           </div>
 
+          {/* Printer Type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Printer Type</label>
+            <div className="flex items-center h-10 gap-3">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  checked={!useThermalPrinter}
+                  onChange={() => setUseThermalPrinter(false)}
+                  className="mr-2"
+                />
+                <span className="text-sm">🖨️ Standard</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  checked={useThermalPrinter}
+                  onChange={() => setUseThermalPrinter(true)}
+                  className="mr-2"
+                />
+                <span className="text-sm">🔥 Thermal</span>
+              </label>
+            </div>
+          </div>
+
           {/* Search */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
@@ -335,6 +360,14 @@ function LabelPrinting({ language, getText }) {
             />
           </div>
         </div>
+        
+        {useThermalPrinter && (
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>🔥 Thermal Printer Mode:</strong> Labels will be generated as individual images optimized for thermal printers (40mm x 25mm).
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Product Selection */}
