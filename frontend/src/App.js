@@ -1479,7 +1479,7 @@ function App() {
                   }`}
                   data-testid="nav-stock-movements"
                 >
-                  {getText('inventory')}
+                  📊 {getText('stockMovements')}
                 </button>
                 <button
                   onClick={() => setCurrentView('invoices')}
