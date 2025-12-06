@@ -77,6 +77,10 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
+  // State for templates
+  const [templates, setTemplates] = useState([]);
+  const [showTemplates, setShowTemplates] = useState(false);
+
   const barcodeInputRef = useRef(null);
   const scanBuffer = useRef('');
   const scanTimeout = useRef(null);
