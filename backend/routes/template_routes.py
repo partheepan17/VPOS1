@@ -32,12 +32,10 @@ async def get_template(template_id: str):
     return template
 
 @router.post("/templates", response_model=SaleTemplate)
-async def create_template(template: SaleTemplateCreate, current_user: dict = None):
+async def create_template(template: SaleTemplateCreate):
     """
     Create a new sale template
     """
-    
-    
     # Check if name already exists
     existing = await db.sale_templates.find_one({"name": template.name})
     if existing:
@@ -48,7 +46,7 @@ async def create_template(template: SaleTemplateCreate, current_user: dict = Non
         "id": str(uuid4()),
         "name": template.name,
         "product_ids": template.product_ids,
-        "created_by": current_user.get("username") if current_user else "admin",
+        "created_by": "admin",
         "created_at": datetime.now(timezone.utc),
         "is_active": True,
         "usage_count": 0,
