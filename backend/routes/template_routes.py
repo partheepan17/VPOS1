@@ -8,12 +8,12 @@ from utils.database import db
 router = APIRouter()
 
 @router.get("/templates", response_model=List[SaleTemplate])
-async def get_templates(active_only: bool = True):
+def get_templates(active_only: bool = True):
     """
     Get all sale templates (global, accessible by all users)
     """
     query = {"is_active": True} if active_only else {}
-    templates = await db.sale_templates.find(query, {"_id": 0}).to_list(100)
+    templates = list(db.sale_templates.find(query, {"_id": 0}).limit(100))
     
     return templates
 
