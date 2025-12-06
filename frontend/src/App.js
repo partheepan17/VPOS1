@@ -1274,11 +1274,12 @@ function App() {
                         clearTimeout(barcodeTimerRef.current);
                       }
                       
-                      // If barcode looks complete (8-13 digits common for barcodes)
-                      if (value.length >= 8) {
+                      // Auto-trigger for barcodes of any reasonable length (3+ characters)
+                      // Most barcodes are 8-13 digits, but support shorter custom barcodes
+                      if (value.length >= 3) {
                         barcodeTimerRef.current = setTimeout(() => {
                           handleBarcodeScanned(value);
-                        }, 300); // 300ms delay after last character
+                        }, 500); // 500ms delay after last character for short barcodes
                       }
                     }}
                     onKeyPress={(e) => {
