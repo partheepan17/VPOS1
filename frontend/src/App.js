@@ -1211,23 +1211,24 @@ function App() {
           {/* Navigation Tabs - Organized by Category */}
           <div className="border-t border-white border-opacity-20 pt-2.5">
             <nav className="flex gap-1.5 flex-wrap items-center">
+                {/* CORE OPERATIONS - Primary buttons */}
                 <button
                   onClick={() => setCurrentView('dashboard')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'dashboard'
-                      ? 'bg-white text-primary-600 shadow-md nav-button-active'
-                      : 'bg-primary-700 text-white hover:bg-primary-800 hover:shadow-lg'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-dashboard"
                 >
-                  🏠 {getText('dashboard')}
+                  📊 {getText('dashboard')}
                 </button>
                 <button
                   onClick={() => setCurrentView('pos')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'pos'
-                      ? 'bg-white text-primary-600 shadow-md nav-button-active'
-                      : 'bg-primary-700 text-white hover:bg-primary-800 hover:shadow-lg'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-pos"
                 >
@@ -1235,21 +1236,26 @@ function App() {
                 </button>
                 <button
                   onClick={() => setCurrentView('sales')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'sales'
-                      ? 'bg-white text-primary-600 shadow-md nav-button-active'
-                      : 'bg-primary-700 text-white hover:bg-primary-800 hover:shadow-lg'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-sales"
                 >
                   💰 {getText('sales')}
                 </button>
+                
+                {/* Divider */}
+                <div className="h-6 w-px bg-white bg-opacity-30"></div>
+                
+                {/* PRODUCTS & INVENTORY */}
                 <button
                   onClick={() => setCurrentView('products')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'products'
-                      ? 'bg-white text-primary-600 shadow-md nav-button-active'
-                      : 'bg-primary-700 text-white hover:bg-primary-800 hover:shadow-lg'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-products"
                 >
