@@ -900,13 +900,27 @@ function App() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Don't trigger shortcuts when typing in input fields
+      // Allow certain shortcuts even in input fields
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        // Allow Ctrl+P even in input fields for printing
+        // Allow Ctrl+P for printing
         if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
           e.preventDefault();
           handlePrintLastInvoice();
+          return;
         }
+        // Allow F2 for payment
+        if (e.key === 'F2') {
+          e.preventDefault();
+          openPaymentModal();
+          return;
+        }
+        // Allow F4 to refocus barcode
+        if (e.key === 'F4') {
+          e.preventDefault();
+          barcodeInputRef.current?.focus();
+          return;
+        }
+        // Block other shortcuts when in input fields
         return;
       }
       
