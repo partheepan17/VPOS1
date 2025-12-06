@@ -2136,21 +2136,32 @@ function App() {
               </div>
             </div>
 
-            <div className="flex gap-3 print:hidden">
+            <div className="space-y-3 print:hidden">
               <button
                 onClick={printInvoice}
-                className="flex-1 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition btn-press"
+                className="w-full px-6 py-4 bg-green-600 hover:bg-green-700 text-white text-xl font-bold rounded-lg transition btn-press flex items-center justify-center gap-2"
                 data-testid="print-invoice-btn"
               >
-                {getText('print')}
+                🖨️ {getText('print')} <span className="text-sm opacity-90">(Ctrl+P)</span>
               </button>
-              <button
-                onClick={() => setShowInvoice(false)}
-                className="flex-1 px-6 py-3 bg-secondary-500 hover:bg-secondary-600 text-white rounded-lg font-medium transition btn-press"
-                data-testid="new-sale-btn"
-              >
-                {getText('newSale')}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowInvoice(false)}
+                  className="flex-1 px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition btn-press"
+                  data-testid="new-sale-btn"
+                >
+                  {getText('newSale')}
+                </button>
+                <button
+                  onClick={() => {
+                    printInvoice();
+                    setShowInvoice(false);
+                  }}
+                  className="flex-1 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition btn-press"
+                >
+                  Print & Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
