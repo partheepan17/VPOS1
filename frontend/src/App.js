@@ -685,7 +685,9 @@ function App() {
       return;
     }
     const { total } = calculateTotals();
-    setPaymentAmount(total.toFixed(2));
+    // Always set payment amount to the exact total (minus loyalty discount)
+    const finalTotal = total - loyaltyDiscount;
+    setPaymentAmount(finalTotal.toFixed(2));
     setShowPaymentModal(true);
   };
 
