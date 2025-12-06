@@ -822,11 +822,16 @@ function App() {
       setShowInvoice(true);
       fetchSalesHistory();
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('=== PAYMENT ERROR ===');
+      console.error('Error:', error);
+      console.error('Response:', error.response);
+      console.error('Response data:', error.response?.data);
+      console.error('Status:', error.response?.status);
       
       // Handle specific error types
       if (error.response?.data?.detail) {
         const detail = error.response.data.detail;
+        console.error('Error detail:', detail);
         
         // Handle insufficient stock error
         if (detail.message && detail.message.includes('Insufficient stock')) {
@@ -840,14 +845,22 @@ function App() {
           showNotification('Insufficient stock! Check inventory.', 'error');
         } else {
           // Other backend errors
-          showNotification(detail.message || detail || 'Payment failed!', 'error');
+          const message = detail.message || detail || 'Payment failed!';
+          console.error('Backend error message:', message);
+          showNotification(message, 'error');
         }
+      } else if (error.message) {
+        // Network or other errors
+        console.error('Network/other error:', error.message);
+        showNotification(`Error: ${error.message}`, 'error');
       } else {
         // Generic error
+        console.error('Unknown error occurred');
         showNotification('Payment failed! Please try again.', 'error');
       }
     }
     setLoading(false);
+    console.log('=== PAYMENT PROCESS END ===');
   };
 
   const loadSampleData = async () => {
