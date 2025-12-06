@@ -1164,16 +1164,23 @@ function App() {
 
       {/* Header */}
       <header className="bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">POS System</h1>
-            <div className="flex items-center gap-4">
+        <div className="container mx-auto px-4 py-3">
+          {/* Top Row: Logo, User, Language, Logout */}
+          <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <span className="text-3xl">🏪</span> POS System
+              </h1>
+            </div>
+            
+            <div className="flex items-center gap-3">
               {/* User Info */}
               {currentUser && (
-                <div className="flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-lg">
+                <div className="flex items-center gap-2 bg-white bg-opacity-20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                  <span className="text-lg">👤</span>
                   <div className="text-right">
-                    <div className="text-sm font-semibold">{currentUser.full_name}</div>
-                    <div className="text-xs opacity-90 capitalize">{currentUser.role}</div>
+                    <div className="text-xs font-semibold leading-tight">{currentUser.full_name}</div>
+                    <div className="text-[10px] opacity-90 capitalize leading-tight">{currentUser.role}</div>
                   </div>
                 </div>
               )}
@@ -1182,25 +1189,28 @@ function App() {
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-white text-primary-600 font-medium focus:outline-none focus:ring-2 focus:ring-secondary-400"
+                className="px-3 py-1.5 rounded-lg bg-white text-primary-600 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-secondary-400 cursor-pointer"
                 data-testid="language-selector"
               >
-                <option value="si">සිංහල</option>
-                <option value="ta">தமிழ்</option>
-                <option value="en">English</option>
+                <option value="si">🇱🇰 සිංහල</option>
+                <option value="ta">🇱🇰 தமிழ்</option>
+                <option value="en">🇬🇧 English</option>
               </select>
 
               {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition"
+                className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition flex items-center gap-1"
                 title="Logout"
               >
-                🚪 Logout
+                🚪 <span className="hidden sm:inline">Logout</span>
               </button>
-              
-              {/* Navigation */}
-              <nav className="flex gap-2 flex-wrap">
+            </div>
+          </div>
+          
+          {/* Navigation Tabs - Organized by Category */}
+          <div className="border-t border-white border-opacity-20 pt-2.5">
+            <nav className="flex gap-1.5 flex-wrap">
                 <button
                   onClick={() => setCurrentView('dashboard')}
                   className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
