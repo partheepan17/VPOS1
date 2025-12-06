@@ -2140,9 +2140,10 @@ function App() {
       {showInvoice && lastSale && (
         <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto fade-in print-area">
+            {/* Invoice Header - Always English */}
             <div className="mb-6">
               <h2 className="text-3xl font-bold text-center text-primary-600 mb-2">
-                {getText('invoice')}
+                INVOICE
               </h2>
               {/* Store header always in English */}
               <div className="text-center text-gray-600">
@@ -2152,27 +2153,29 @@ function App() {
               </div>
             </div>
 
+            {/* Invoice Details - Always English */}
             <div className="border-t border-b border-gray-300 py-4 mb-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p><strong>{getText('invoiceNo')}:</strong> {lastSale.invoice_number}</p>
-                  <p><strong>{getText('date')}:</strong> {new Date(lastSale.created_at).toLocaleString()}</p>
+                  <p><strong>Invoice No:</strong> {lastSale.invoice_number}</p>
+                  <p><strong>Date:</strong> {new Date(lastSale.created_at).toLocaleString()}</p>
                 </div>
                 <div>
-                  <p><strong>{getText('customer')}:</strong> {lastSale.customer_name}</p>
+                  <p><strong>Customer:</strong> {lastSale.customer_name}</p>
                   <p><strong>Terminal:</strong> {lastSale.terminal_name}</p>
                 </div>
               </div>
             </div>
 
+            {/* Items Table - Headers in English, Product names in selected language */}
             <table className="w-full mb-4">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-3 py-2 text-left text-sm">{getText('item')}</th>
-                  <th className="px-3 py-2 text-right text-sm">{getText('qty')}</th>
-                  <th className="px-3 py-2 text-right text-sm">{getText('price')}</th>
-                  <th className="px-3 py-2 text-right text-sm">{getText('discount')}</th>
-                  <th className="px-3 py-2 text-right text-sm">{getText('total')}</th>
+                  <th className="px-3 py-2 text-left text-sm">Item</th>
+                  <th className="px-3 py-2 text-right text-sm">Qty</th>
+                  <th className="px-3 py-2 text-right text-sm">Price</th>
+                  <th className="px-3 py-2 text-right text-sm">Discount</th>
+                  <th className="px-3 py-2 text-right text-sm">Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -2190,19 +2193,20 @@ function App() {
               </tbody>
             </table>
 
+            {/* Totals Section - Subtotal & Grand Total in English, Total Discount in selected language */}
             <div className="border-t-2 border-gray-300 pt-4 mb-6">
               <div className="flex justify-end">
                 <div className="w-64 space-y-2">
                   <div className="flex justify-between">
-                    <span>{getText('subtotal')}:</span>
+                    <span>Subtotal:</span>
                     <span>LKR {lastSale.subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-red-600">
+                  <div className={`flex justify-between text-red-600 ${language === 'si' ? 'sinhala-text' : language === 'ta' ? 'tamil-text' : ''}`}>
                     <span>{getText('totalDiscount')}:</span>
                     <span>- LKR {lastSale.total_discount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-xl font-bold text-primary-700 border-t pt-2">
-                    <span>{getText('grandTotal')}:</span>
+                    <span>Grand Total:</span>
                     <span>LKR {lastSale.total.toFixed(2)}</span>
                   </div>
                 </div>
