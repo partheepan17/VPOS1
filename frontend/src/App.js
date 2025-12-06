@@ -923,7 +923,13 @@ function App() {
       setLastSale(sale);
       
       // Trigger fast background print immediately (no modal, no delays)
-      fastPrintInvoice(sale);
+      // Wrap in try-catch to ensure printing errors don't block the workflow
+      try {
+        fastPrintInvoice(sale);
+      } catch (printError) {
+        console.error('Print error (non-blocking):', printError);
+        // Don't stop the workflow even if printing fails
+      }
       
       // Close modals and clear cart IMMEDIATELY - ready for next customer
       setShowPaymentModal(false);
