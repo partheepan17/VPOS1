@@ -1113,6 +1113,11 @@ function App() {
         fetchHeldBills();
         setShowHeldBills(true);
       }
+      // F9 - Reprint Last Invoice (Fast print for busy shops)
+      if (e.key === 'F9') {
+        e.preventDefault();
+        handlePrintLastInvoice();
+      }
       // Ctrl+P - Print Last Invoice
       if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
         e.preventDefault();
