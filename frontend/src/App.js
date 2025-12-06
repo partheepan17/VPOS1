@@ -2240,10 +2240,10 @@ function App() {
             <div className="space-y-3 print:hidden">
               <button
                 onClick={printInvoice}
-                className="w-full px-6 py-4 bg-green-600 hover:bg-green-700 text-white text-xl font-bold rounded-lg transition btn-press flex items-center justify-center gap-2"
-                data-testid="print-invoice-btn"
+                className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold rounded-lg transition btn-press flex items-center justify-center gap-2"
+                data-testid="preview-invoice-btn"
               >
-                🖨️ {getText('print')} <span className="text-sm opacity-90">(Ctrl+P)</span>
+                👁️ Preview Invoice <span className="text-sm opacity-90">(Ctrl+P)</span>
               </button>
               <div className="flex gap-3">
                 <button
@@ -2258,9 +2258,9 @@ function App() {
                     printInvoice();
                     setShowInvoice(false);
                   }}
-                  className="flex-1 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition btn-press"
+                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition btn-press"
                 >
-                  Print & Close
+                  🖨️ Print & Close
                 </button>
               </div>
             </div>
