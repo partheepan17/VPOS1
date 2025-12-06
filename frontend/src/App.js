@@ -1762,7 +1762,7 @@ function App() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-primary-600">
                           LKR {sale.total.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm space-x-3">
                           <button
                             onClick={() => {
                               setLastSale(sale);
@@ -1771,6 +1771,15 @@ function App() {
                             className="text-primary-600 hover:text-primary-800 font-medium"
                           >
                             {getText('view')}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setLastSale(sale);
+                              setTimeout(() => printInvoice(), 100);
+                            }}
+                            className="text-green-600 hover:text-green-800 font-medium"
+                          >
+                            🖨️ Print
                           </button>
                         </td>
                       </tr>
