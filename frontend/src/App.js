@@ -1622,6 +1622,18 @@ function App() {
                 >
                   {getText('pay')} <span className="shortcut-hint">(F2)</span>
                 </button>
+
+                {lastSale && (
+                  <button
+                    onClick={() => {
+                      printInvoice();
+                      showNotification('Printing last invoice...', 'success');
+                    }}
+                    className="w-full mt-3 px-6 py-3 bg-green-500 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition btn-press flex items-center justify-center gap-2"
+                  >
+                    🖨️ Print Last Invoice <span className="text-sm opacity-90">(Ctrl+P)</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
