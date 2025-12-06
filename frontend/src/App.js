@@ -938,6 +938,14 @@ function App() {
       setLoyaltyDiscount(0);
       clearCart();
       
+      // Auto-focus barcode input for immediate next customer (HIGH-SPEED MODE)
+      setTimeout(() => {
+        const barcodeInput = document.querySelector('input[placeholder*="Scan"], input[placeholder*="barcode"]');
+        if (barcodeInput) {
+          barcodeInput.focus();
+        }
+      }, 100);
+      
       showNotification(
         stripePaymentIntent 
           ? '✅ Payment successful! Ready for next customer' 
