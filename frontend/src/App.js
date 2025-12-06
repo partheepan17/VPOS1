@@ -1210,7 +1210,7 @@ function App() {
           
           {/* Navigation Tabs - Organized by Category */}
           <div className="border-t border-white border-opacity-20 pt-2.5">
-            <nav className="flex gap-1.5 flex-wrap">
+            <nav className="flex gap-1.5 flex-wrap items-center">
                 <button
                   onClick={() => setCurrentView('dashboard')}
                   className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
