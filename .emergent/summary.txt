@@ -3,176 +3,180 @@ The user wants to build a lightweight, keyboard-first Point of Sale (POS) system
 
 **PRODUCT REQUIREMENTS:**
 - **Vision:** A fast, keyboard-first POS with support for Sinhala/Tamil invoicing, tiered pricing, bulk CSV tools, multi-terminal setup, and cloud backups.
-- **Core Features:**
-    - **Sales & Checkout:** Barcode scanning (including weight integration), keyboard-only checkout, multiple payment methods (cash, card, QR), hold/resume bills, and multi-language invoice printing.
-    - **Discounts:** Line and group discounts with validation.
-    - **Data Management:** Products, Suppliers, and Customers with tiered pricing.
-    - **Bulk Operations:** Full CSV import/export for products, prices, suppliers, customers, and discount rules.
-    - **Inventory:** Lightweight stock tracking, receiving, and low-stock alerts.
-    - **Reports:** Daily, weekly, monthly sales reports by various dimensions.
-    - **Settings:** Store info, device config, and user permissions.
-    - **User Authentication:** Manager and Cashier roles.
-    - **Cloud Integration:** Cloud backups (GCS), Email/SMS notifications.
-- **User Decisions:**
-    - Architecture: Real LAN server-client model.
-    - Barcode: Support both physical scanner and manual entry.
-    - Backup: Google Cloud Storage.
-    - Printing: Support both thermal printers (ESC/POS) and standard print dialogs.
-    - Language: Sinhala as default, with Tamil and English options.
+- **Core Features:** Sales & Checkout, Data Management, Inventory Management, Discounts, Settings, and Keyboard Shortcuts.
+- **User-Prioritized Feature Roadmap (as of Message #449):**
+    1.  **Fix Current Issues**: Debug payment failures, improve POS navigation, add translations, performance optimizations.
+    2.  **Quick Wins**: Backup & Restore, Product Bundles, Quick Sale Templates, Customer Credit Accounts, Barcode Printer Integration, Cash Drawer Management.
+    3.  **Advanced Reporting & Analytics**: Profit margins, sales trends, etc.
+    4.  **SMS Notifications (Twilio)**
+    5.  **Multiple Store Locations**
+    6.  **Purchase Orders (PO Management)**
+    7.  **Staff Scheduling**
 
 **User's preferred language**: English
 
 **what currently exists?**
-A comprehensive full-stack POS application has been built with a FastAPI backend, React frontend, and MongoDB database. The application includes a wide range of features: user authentication (manager/cashier roles), a multi-language UI (English, Sinhala, Tamil), a POS interface with barcode scanning (auto-enter) and product search (by name/SKU), management pages for products, customers, discounts, and terminals. It also features advanced analytics with charts, label printing (with PDF generation), invoice printing, and an enhanced set of sample data. The backend now uses connection pooling for MongoDB. The core logic for discount application exists but seems to have a regression.
+A feature-rich full-stack POS application with a FastAPI/MongoDB backend and a React frontend. The session saw the addition of several major features:
+- A mocked Stripe payment integration.
+- A complete Customer Loyalty Program (points, redemption, settings).
+- A Store Customization page for receipt/label/email settings.
+- A User Management UI for creating/editing users and assigning roles.
+- A comprehensive Feature Management page with over a dozen toggles to control system behavior (e.g., allowing sales with negative stock).
+- Numerous bug fixes and UX improvements, including a critical fix for a persistent Payment Failed error.
 
 **Last working item**:
-- **Last item agent was working**: Investigating a user-reported bug where automatic discount rules are not being applied to the cart when items are added or quantities are changed. The agent had just started reviewing the discount application logic in .
-- **Status**: IN PROGRESS
+- **Last item agent was working**: The agent was about to start implementing a new user request to overhaul the invoice printing functionality. The user wants specific parts of the invoice to be multi-language while the store header remains in English, and wants to control the print behavior (direct print vs. print preview).
+- **Status**: NOT STARTED
 - **Agent Testing Done**: N
-- **Which testing method agent to use?**: both
+- **Which testing method agent to use?**: both. The backend logic for generating sale data () and the frontend rendering of the invoice modal () will need changes. Testing should be done with the  to verify the visual layout and content of the invoice modal.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1**: Discount rules are not being applied automatically during invoicing. (Priority: P0)
-- **Issue 2**: Monolithic code structure ( and ). (Priority: P1)
+- **Issue 1**: Refine Invoice Printing Logic (P0)
+- **Issue 2**: Monolithic Code Structure (P2)
 
 **Issues Detail:**
-- **Issue 1**: 
-    - **Description**: The user reported that when an item is added to the cart that qualifies for a discount, the discount is not being applied. This is a regression, as the agent had previously worked on this feature.
-    - **Attempted fixes**: The agent added a function  in  that calls a backend endpoint (). This function is called when adding items to the cart () and updating quantities (). The agent also corrected the field names in the seed data for discounts. However, the issue persists.
+- **Issue 1**:
+    - **Description**: The user is unsatisfied with the current invoice format and behavior. The request has five parts:
+        1.  The invoice header (Store Name, Address, Tel) must always be in English.
+        2.  The product names in the item list must be displayed in the currently selected language (EN/SI/TA).
+        3.  Labels like Total Discount must be translated according to the selected language.
+        4.  The Thank you footer should only show the message corresponding to the selected language, not all three.
+        5.  The system should print directly to the configured device printer after a sale, and only show a print preview when explicitly requested by the operator.
+    - **Attempted fixes**: None. This is a new request.
     - **Next debug checklist**:
-        1.  In , verify the  function is being called correctly within  and .
-        2.  Use browser developer tools to inspect the network request to . Check the payload (the cart being sent) and the response from the backend.
-        3.  In , thoroughly debug the  endpoint. Check its logic for finding and applying both  and  rules.
-        4.  Verify that the discount rules in the database are correctly formatted and marked as  and .
-        5.  Ensure the frontend correctly processes the updated cart returned from the backend and re-renders the UI to show the discount.
-    - **Why fix this issue and what will be achieved with the fix?**: This is a critical business logic failure. Fixing it will ensure correct pricing and make the POS system usable for sales.
+        1.  Inspect the invoice modal rendering code in  (around line 1960).
+        2.  Modify the JSX to conditionally render headers in English, while using the  function for translatable labels.
+        3.  Ensure the  function is correctly applied to sale items.
+        4.  Change the footer to a conditional block based on the  state.
+        5.  Update the  and  functions to control the  behavior and differentiate between direct printing and preview.
+    - **Why fix this issue and what will be achieved with the fix?**: This will provide a more professional and user-friendly invoice that meets the specific localization and operational needs of the user.
+    - **Status**: NOT STARTED
+    - **Is recurring issue?**: N
+    - **Should Test frontend/backend/both after fix?**: frontend
+    - **Blocked on other issue**: None
+
+- **Issue 2**:
+    - **Description**: The primary backend file () and frontend file () are still very large and contain logic for multiple features, making maintenance difficult.
+    - **Attempted fixes**: The agent has successfully added new features (Loyalty, Store Settings, System Settings) into separate route and model files, following the established modular structure. However, core logic like sales and product lookups remains in .
+    - **Next debug checklist**: Systematically move endpoint logic from  into the respective files in . Refactor  by breaking it down into smaller, self-contained components under .
+    - **Why fix this issue and what will be achieved with the fix?**: Completing the refactoring will improve code maintainability, readability, and scalability.
     - **Status**: IN PROGRESS
     - **Is recurring issue?**: Y
     - **Should Test frontend/backend/both after fix?**: both
     - **Blocked on other issue**: None
 
-- **Issue 2**:
-    - **Description**: The primary frontend ( > 1200 lines) and backend ( > 2000 lines) files are monolithic. This increases complexity, makes debugging difficult, and hinders scalability.
-    - **Attempted fixes**: None in this session.
-    - **Next debug checklist**:
-        - **Backend**: Create directories , , . Split  by moving Pydantic models to , API routers to , and business logic to .
-        - **Frontend**: Create directories , , , . Break down  into individual page components (e.g., , ) and move shared UI elements into . Manage global state (like auth, language) using React Context.
-    - **Why fix this issue and what will be achieved with the fix?**: Refactoring will significantly improve code maintainability, readability, and scalability, making it easier to add new features and fix bugs.
-    - **Status**: NOT STARTED
-    - **Is recurring issue?**: Y
-    - **Should Test frontend/backend/both after fix?**: both
-    - **Blocked on other issue**: None
-
 **In progress Task List**:
-None. The current focus is on a bug fix.
+- None
 
 **Upcoming and Future Tasks**
-- **Upcoming Tasks**:
-    - **Refactor Codebase (P1)**: Address Issue #2 by breaking down monolithic files.
-    - **Implement Cloud Backup (P2)**: Implement the Google Cloud Storage integration for backups. The backend structure is mocked; it needs credentials and the actual upload logic. ( has details).
-    - **Implement Email/SMS Notifications (P2)**: Implement the mocked logic for notifications.
+- **Upcoming Tasks**: (Based on user's priority list from message #449)
+    - **Improve POS page navigation (P1)**
+    - **Add more translations (P1)**
+    - **Performance optimizations (P1)**
+    - **Backup & Restore (P1)**: Implement manual and automatic database backups.
+    - **Product Bundles (P2)**: Create functionality to sell multiple products as a single unit.
+    - **Quick Sale Templates (P2)**: Allow users to save and load common combinations of items.
+    - **Customer Credit Accounts (P2)**: Track customer credit/debt.
 - **Future Tasks**:
-    - **Implement Offline Mode Enhancements (P3)**: Improve offline capabilities.
-    - **Implement Full Multi-Terminal Sync (P3)**: Enhance the basic terminal management with WebSockets for real-time data synchronization.
-    - **Implement ESC/POS Printer Support (P3)**: Add direct printing support for thermal receipt printers.
+    - **Advanced Reporting & Analytics**
+    - **SMS Notifications (Twilio Integration)**
+    - **Multiple Store Locations Support**
+    - **Purchase Order (PO) Management**
+    - **Staff Scheduling**
 
 **Completed work in this session**
-- **P0 Blocker Resolution**: Fixed a recurring MongoDB  serialization error by implementing a global helper function.
-- **User Authentication (Phase 13)**: Implemented a complete JWT-based authentication system with  and  roles, including a login page and protected routes.
-- **Comprehensive Multi-Language Support (Phase 11)**: Centralized all UI strings into a  file, making all components and pages fully translatable (EN, SI, TA).
-- **Advanced Reporting & Analytics (Phase 14)**: Created an Analytics page with charts (sales trends, top products, etc.) using .
-- **POS UX Enhancements**:
-    - Added auto-enter functionality to the barcode input, adding products to the cart automatically after a scan.
-    - Implemented a powerful product search bar on the POS screen to find products by name or SKU, with keyboard support (Enter to add).
-- **Label & Invoice Printing (Phases 7 & 8)**: Built features to generate and print product labels (with barcodes) and sales invoices, including PDF generation.
-- **Data and UI Polish (Phase 12 & others)**:
-    - Implemented MongoDB connection pooling on the backend.
-    - Significantly improved the seed data to be more realistic and comprehensive.
-    - Applied a major UI/UX overhaul with improved CSS, animations, and consistent styling.
-- **Phase 6 Completion**: Finished the Product and Customer management pages and added a new main Dashboard component.
-- **Documentation**: Created  and .
+- **Critical Bug Fix**: Resolved the persistent Payment Failed issue. The root cause was a  in  when creating a sale record, which was fixed by adding the correct import.
+- **Feature Management System**: Created a new page () and corresponding backend () to allow enabling/disabling over a dozen features via UI toggles, including Allow Negative Stock.
+- **Customer Loyalty Program**: Implemented a full loyalty system with points tracking on purchases, a redemption system in the payment modal, and a settings page ().
+- **User Management UI**: Created a new page () to view, add, and edit users and their roles, leveraging existing backend APIs.
+- **Store & Receipt Customization**: Built a new page () to manage store info, receipt logo/text, and barcode label settings.
+- **Email Receipt & CSV Export**: Added functionality to email receipts from the invoice modal and export sales history as a CSV file.
+- **Barcode Scanning Fix**: Improved the barcode scanning logic in  to handle short barcodes and fixed a bug where items would disappear from the cart after being added.
+- **UX & Shortcut Fixes**: Fixed the F2 'Pay' shortcut to work from input fields and added more prominent Print buttons to improve usability.
+- **Deployment Readiness**: Ran a deployment health check and fixed a critical  serialization issue in .
 
 **Earlier issues found/mentioned but not fixed**
-- The monolithic structure of  and  was identified in the previous summary and has become more critical as more features were added. The agent opted to add features rather than refactor.
+- The monolithic structure of  and  remains the most significant piece of technical debt. While the refactoring has started, it is far from complete.
 
 **Known issue recurrence from previous fork**
-- **MongoDB ObjectId Serialization**: This was the primary recurring issue from the previous fork. The agent addressed this by adding a  helper function and auditing endpoints. This appears to be resolved.
-- **Discount Rule Application**: This is a new regression within this session. It was implemented, reported as not working, fixed, and then reported as not working again in the user's final message.
+- **Monolithic Codebase**: This is a recurring architectural problem. While new features are being added in a modular way, the core files continue to grow, making a full refactor more urgent.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend**: FastAPI, Pydantic, MongoDB (), JWT (, ), Connection Pooling.
-- **Frontend**: React (Hooks), Tailwind CSS, , , , , .
+- **Backend**: FastAPI, Pydantic, MongoDB (), JWT.
+- **Frontend**: React (Hooks), Tailwind CSS, .
+- **Testing**: Heavy reliance on  for backend endpoint testing and user-provided feedback with console screenshots for frontend debugging.
 
 **key DB schema**
-- **products**:  (added date fields)
-- **sales**: 
-- **customers**: 
-- **users**:  (new collection)
+- **customers**: Added , .
+- **loyalty_settings** (NEW): 
+- **loyalty_transactions** (NEW): 
+- **store_settings** (NEW): 
+- **system_settings** (NEW):  (e.g., )
 
 **changes in tech stack**
-- **Backend**: Added  and  for authentication.
-- **Frontend**: Added , , , and .
+- No new libraries were added in this session.  was installed in the previous one.
 
-**All files**
+**All files of reference**
 - **Created**:
-  - : For user login.
-  - : Main dashboard view.
-  - : For charts and analytics.
-  - : For product label generation.
-  - : For sales invoice display.
-  - : For multi-language support.
-  - : For recording test agent results.
-  - , : Documentation.
+  - 
+  - 
+  - 
 - **Updated**:
-  - : Heavily modified to add auth, advanced reports, connection pooling, improved seeding, and discount logic.
-  - : Heavily modified to integrate all new components, auth flow, search, auto-enter, and i18n.
-  - : Overhauled with new production-ready styles.
-  - : Added new date fields to the form.
-  - : Updated to support multi-language product names.
+  - : Major changes to sales logic to check for system settings, bug fix for missing  import, integration of all new routers.
+  - : Extremely large number of changes to integrate all new features, fix barcode scanning, fix F2 shortcut, improve payment flow, and add robust error handling.
+  - : Added loyalty fields.
+  - : Fixed ObjectId serialization.
 
 **Areas that need refactoring**:
-- **Critical**:  and  are now extremely large and complex. They are difficult to maintain and must be broken down into smaller, single-responsibility modules as described in Issues Detail.
+- **Critical**:  and  must be refactored. They have grown significantly larger in this session, accumulating more technical debt. All core logic (sales, products, customers) should be moved out of  into their own route/service files.  should be broken down into a layout component and separate page components.
 
 **key api endpoints**
-- : POST, for user login and getting a JWT token.
-- : GET, to fetch the current authenticated user's details.
-- : POST, to apply discount rules to a given cart.
-- , , etc.: New GET endpoints for advanced analytics.
+- : (Mocked) Endpoints for creating and confirming Stripe payments.
+- : GET/POST endpoints for managing loyalty settings and transactions.
+- : GET/POST endpoints for managing feature toggles.
+- : GET/POST endpoints for managing store and receipt customization.
+- : GET endpoint to download a CSV of sales data.
+- : POST endpoint to send an email receipt.
 
 **Critical Info for New Agent**
-- **Priority #1**: Your immediate task is to fix the discount rule application logic. The user has reported this is not working. Start by debugging the entire flow from  () to the backend  endpoint.
-- **Priority #2**: The monolithic nature of  and  is a major source of technical debt. After fixing the discount bug, you should strongly propose and begin refactoring the codebase.
-- The user has requested no testing for the last couple of implementations. It is highly recommended to perform testing after fixing the discount issue to ensure no new regressions were introduced.
+- **Top Priority**: Your first task is to fix the invoice printing logic as detailed in the user's last message (Message #483). This is a multi-part request involving localization and print behavior.
+- **Payment Bug is FIXED**: A persistent Payment Failed bug was finally resolved. The root cause was a  in  due to a missing  import. Do not waste time re-investigating this; the fix is confirmed.
+- **Follow New Roadmap**: The user provided a new, clear priority list in Message #449. After fixing the invoice, follow this roadmap, starting with the Fix Current Issues and Quick Wins sections.
+- **Stripe is Mocked**: The payment integration uses a mocked backend. The user may ask to connect it to real Stripe keys later.
 
 **documents created in this job**
-- 
-- 
-- 
+- : A temporary guide created to help the user debug the payment issue.
 
-**Last 5 User Messages and any pending user messages**
-1.  **add a search and find products and find product by SKU ID as well**: Request fulfilled. Agent added a comprehensive product search feature.
-2.  **in product search if user press enter product should add to the cart...**: Request fulfilled. Agent added Enter key support to the search bar.
-3.  **check the discount rules, discount should be added to the cart whenever the rule achived**: **PENDING**. This is the last active request and the highest priority task.
-4.  **Dont perform testings for this implementation**: Acknowledged by the agent for the last two minor changes.
-5.  **Dont do testign**: Acknowledged by the agent for the last two minor changes.
+**Last 10 User Messages and any pending user messages**
+1.  **test failed, payment failed**: User reports payment is failing again, despite previous fixes. (PENDING, led to final fix)
+2.  **continue with Next steps**: User wants to see the plan. (COMPLETED)
+3.  **do in this order**: User provides a new, detailed, prioritized roadmap for future work. (PENDING)
+4.  **continue with Next steps**: User confirms to proceed. (COMPLETED)
+5.  **error message from console**: User provides a screenshot of the browser console, which was critical for debugging. (COMPLETED)
+6.  **in this invoice...**: User provides a detailed, multi-point request to fix the invoice layout, localization, and print behavior. This is the current highest-priority task. (PENDING)
 
 **Project Health Check:**
-- **Broken**: The core business logic for applying discounts is currently broken.
-- **Mocked**: Cloud backup (GCS), Email/SMS notifications. The backend structure and UI elements exist, but they require credentials and final implementation.
+- **Broken**: None. The critical payment bug has been resolved.
+- **Mocked**:
+    - Stripe Payment integration.
+    - Cloud Backup (GCS) and Email Notifications (services exist but are not configured with real user credentials).
+
+**3rd Party Integrations**
+- **Stripe**: Partially integrated using . The backend uses mocked responses. A real API key is needed for a full implementation.
 
 **Testing status**
-- **Testing agent used after significant changes**: YES, multiple times for backend testing.
+- **Testing agent used after significant changes**: NO
 - **Troubleshoot agent used after agent stuck in loop**: NO
-- **Test files created**: 
-- **Known regressions**: The automatic discount application feature has regressed and is not working.
+- **Test files created**: None.
+- **Known regressions**: A bug where items disappeared from the cart was introduced and fixed within this session.
 
 **Credentials to test flow:**
 - **Username**: 
 - **Password**: 
 
 **What agent forgot to execute**
-- The major refactoring of  and  has been consistently postponed in favor of adding new features. This is the most significant pending architectural task.</analysis>
+- The agent has not forgotten any direct user requests. However, the major architectural task of refactoring the monolithic  and  files has been continuously deferred in favor of implementing new features, leading to increased technical debt.</analysis>

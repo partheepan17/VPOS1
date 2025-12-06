@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 import sys
 
 # Use the production backend URL from frontend/.env
-BASE_URL = "https://retailrocket-1.preview.emergentagent.com/api"
+BASE_URL = "https://swiftcheckout-2.preview.emergentagent.com/api"
 
 # Global auth token for authenticated requests
 AUTH_TOKEN = None
