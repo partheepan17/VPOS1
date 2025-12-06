@@ -16,6 +16,7 @@ function LabelPrinting({ language, getText }) {
   const [labelType, setLabelType] = useState('full');
   const [showPreview, setShowPreview] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [useThermalPrinter, setUseThermalPrinter] = useState(false);
   const labelRef = useRef(null);
 
   useEffect(() => {
