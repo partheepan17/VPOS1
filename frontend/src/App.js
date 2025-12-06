@@ -1482,38 +1482,6 @@ function App() {
                   📊 {getText('stockMovements')}
                 </button>
  
-                <button
-                  onClick={() => setCurrentView('store-custom')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                    currentView === 'store-custom'
-                      ? 'bg-white text-pink-600 shadow-md nav-button-active'
-                      : 'bg-pink-600 text-white hover:bg-pink-700 hover:shadow-lg'
-                  }`}
-                >
-                  🏪 Store
-                </button>
-                <button
-                  onClick={() => setCurrentView('devices')}
-                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                    currentView === 'devices'
-                      ? 'bg-white text-cyan-600 shadow-md nav-button-active'
-                      : 'bg-cyan-600 text-white hover:bg-cyan-700 hover:shadow-lg'
-                  }`}
-                  data-testid="nav-devices"
-                >
-                  🖨️ Devices
-                </button>
-                <button
-                  onClick={() => setCurrentView('terminals')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
-                    currentView === 'terminals'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
-                  }`}
-                  data-testid="nav-terminals"
-                >
-                  {getText('terminals')}
-                </button>
               </nav>
             </div>
           </div>
