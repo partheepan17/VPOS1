@@ -182,6 +182,18 @@ frontend:
         agent: "testing"
         comment: "✓ COMPREHENSIVE TESTING COMPLETE - All core functionality working: Navigation ✓, Page components ✓, Button state management ✓, Barcode type switching (EAN-13/EAN-8/QR) ✓, Label type options ✓, Search functionality ✓, Product selection ✓, Select All/Deselect All ✓, Print Labels ✓. Minor: PDF generation has technical jsPDF library issue with PNG processing but button functionality works."
 
+  - task: "Thermal Printer Integration"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/LabelPrinting.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW FEATURE: Thermal printer mode with backend API integration needs comprehensive testing. Features include: thermal printer toggle, backend label generation API (/api/barcode/generate-label), optimized 40mm x 25mm labels, multiple barcode formats (EAN-13, CODE128, EAN-8), individual label tabs for printing."
+
   - task: "Invoice Language Testing"
     implemented: true
     working: true
