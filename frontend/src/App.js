@@ -430,7 +430,14 @@ function App() {
         updatedCart, 
         { params: { price_tier: selectedTier } }
       );
-      setCart(response.data.items);
+      // Check if response has items
+      if (response.data && response.data.items && response.data.items.length > 0) {
+        setCart(response.data.items);
+      } else {
+        // If no items returned, use the updated cart
+        console.warn('Discount API returned empty items, using local cart');
+        setCart(updatedCart);
+      }
     } catch (error) {
       console.error('Error applying discounts:', error);
       // If discount application fails, still add the item without discount
