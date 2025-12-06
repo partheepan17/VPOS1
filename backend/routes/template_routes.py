@@ -22,7 +22,7 @@ async def get_template(template_id: str):
     """
     Get a specific template by ID
     """
-    db = get_database()
+    
     
     template = await db.sale_templates.find_one({"id": template_id}, {"_id": 0})
     
@@ -36,7 +36,7 @@ async def create_template(template: SaleTemplateCreate, current_user: dict = Non
     """
     Create a new sale template
     """
-    db = get_database()
+    
     
     # Check if name already exists
     existing = await db.sale_templates.find_one({"name": template.name})
@@ -64,7 +64,7 @@ async def update_template(template_id: str, template_update: SaleTemplateUpdate)
     """
     Update an existing template
     """
-    db = get_database()
+    
     
     # Check if template exists
     existing_template = await db.sale_templates.find_one({"id": template_id})
@@ -90,7 +90,7 @@ async def delete_template(template_id: str):
     """
     Delete a template (soft delete by setting is_active=False)
     """
-    db = get_database()
+    
     
     result = await db.sale_templates.update_one(
         {"id": template_id},
@@ -107,7 +107,7 @@ async def record_template_usage(template_id: str):
     """
     Record template usage (increment usage_count and update last_used)
     """
-    db = get_database()
+    
     
     result = await db.sale_templates.update_one(
         {"id": template_id},
@@ -127,7 +127,7 @@ async def get_template_products(template_id: str):
     """
     Get all products for a template with full product details
     """
-    db = get_database()
+    
     
     # Get template
     template = await db.sale_templates.find_one({"id": template_id}, {"_id": 0})
