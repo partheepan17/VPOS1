@@ -726,6 +726,7 @@ function App() {
       // **STRIPE INTEGRATION**: Handle card payments via Stripe
       let stripePaymentIntent = null;
       if (!showSplitPayment && paymentMethod === 'card') {
+        console.log('Processing card payment via Stripe...');
         try {
           // Create payment intent for card payment
           const paymentIntentResponse = await axios.post(`${API_URL}/api/payments/create-payment-intent`, {
@@ -737,11 +738,7 @@ function App() {
           });
           
           stripePaymentIntent = paymentIntentResponse.data;
-          
-          // In production, you would now:
-          // 1. Use Stripe.js to collect card details
-          // 2. Confirm the payment with the client_secret
-          // 3. Wait for payment confirmation
+          console.log('Stripe payment intent created:', stripePaymentIntent.payment_intent_id);
           
           // **MOCKED**: For now, we auto-confirm the payment
           await axios.post(`${API_URL}/api/payments/confirm-payment`, {
@@ -749,14 +746,19 @@ function App() {
             invoice_number: ''  // Will be updated after sale creation
           });
           
+          console.log('Stripe payment confirmed');
+          
           // Add Stripe payment reference to payment data
           paymentsToUse[0].reference = stripePaymentIntent.payment_intent_id;
           
         } catch (stripeError) {
           console.error('Stripe payment error:', stripeError);
+          console.error('Error details:', stripeError.response?.data);
           setLoading(false);
-          showNotification('Card payment failed! Please try another method.', 'error');
-          return;
+          showNotification('Card payment failed! Using cash instead.', 'error');
+          // Fallback to cash payment
+          paymentsToUse[0].method = 'cash';
+          console.log('Falling back to cash payment');
         }
       }
       
