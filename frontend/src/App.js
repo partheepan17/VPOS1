@@ -2209,10 +2209,11 @@ function App() {
               </div>
             </div>
 
+            {/* Thank you footer - show only selected language */}
             <div className="text-center text-sm text-gray-500 mb-6">
-              <p>Thank you for your business!</p>
-              <p className="sinhala-text">ස්තූතියි!</p>
-              <p className="tamil-text">நன்றி!</p>
+              {language === 'en' && <p>Thank you for your business!</p>}
+              {language === 'si' && <p className="sinhala-text">ස්තූතියි!</p>}
+              {language === 'ta' && <p className="tamil-text">நன்றி!</p>}
             </div>
 
             {/* Email Receipt Section */}
