@@ -1238,6 +1238,16 @@ function App() {
                   👥 Users
                 </button>
                 <button
+                  onClick={() => setCurrentView('features')}
+                  className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                    currentView === 'features'
+                      ? 'bg-white text-indigo-600 shadow-md nav-button-active'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg'
+                  }`}
+                >
+                  🎛️ Features
+                </button>
+                <button
                   onClick={() => setCurrentView('settings')}
                   className={`nav-button px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                     currentView === 'settings'
