@@ -18,13 +18,13 @@ def get_templates(active_only: bool = True):
     return templates
 
 @router.get("/templates/{template_id}", response_model=SaleTemplate)
-async def get_template(template_id: str):
+def get_template(template_id: str):
     """
     Get a specific template by ID
     """
     
     
-    template = await db.sale_templates.find_one({"id": template_id}, {"_id": 0})
+    template = db.sale_templates.find_one({"id": template_id}, {"_id": 0})
     
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
@@ -32,12 +32,12 @@ async def get_template(template_id: str):
     return template
 
 @router.post("/templates", response_model=SaleTemplate)
-async def create_template(template: SaleTemplateCreate):
+def create_template(template: SaleTemplateCreate):
     """
     Create a new sale template
     """
     # Check if name already exists
-    existing = await db.sale_templates.find_one({"name": template.name})
+    existing = db.sale_templates.find_one({"name": template.name})
     if existing:
         raise HTTPException(status_code=400, detail="Template name already exists")
     
@@ -53,19 +53,19 @@ async def create_template(template: SaleTemplateCreate):
         "last_used": None
     }
     
-    await db.sale_templates.insert_one(new_template)
+    db.sale_templates.insert_one(new_template)
     
     return SaleTemplate(**new_template)
 
 @router.put("/templates/{template_id}", response_model=SaleTemplate)
-async def update_template(template_id: str, template_update: SaleTemplateUpdate):
+def update_template(template_id: str, template_update: SaleTemplateUpdate):
     """
     Update an existing template
     """
     
     
     # Check if template exists
-    existing_template = await db.sale_templates.find_one({"id": template_id})
+    existing_template = db.sale_templates.find_one({"id": template_id})
     if not existing_template:
         raise HTTPException(status_code=404, detail="Template not found")
     
@@ -73,24 +73,24 @@ async def update_template(template_id: str, template_update: SaleTemplateUpdate)
     update_data = {k: v for k, v in template_update.dict(exclude_unset=True).items() if v is not None}
     
     if update_data:
-        await db.sale_templates.update_one(
+        db.sale_templates.update_one(
             {"id": template_id},
             {"$set": update_data}
         )
     
     # Fetch updated template
-    updated_template = await db.sale_templates.find_one({"id": template_id}, {"_id": 0})
+    updated_template = db.sale_templates.find_one({"id": template_id}, {"_id": 0})
     
     return SaleTemplate(**updated_template)
 
 @router.delete("/templates/{template_id}")
-async def delete_template(template_id: str):
+def delete_template(template_id: str):
     """
     Delete a template (soft delete by setting is_active=False)
     """
     
     
-    result = await db.sale_templates.update_one(
+    result = db.sale_templates.update_one(
         {"id": template_id},
         {"$set": {"is_active": False}}
     )
@@ -101,13 +101,13 @@ async def delete_template(template_id: str):
     return {"message": "Template deleted successfully"}
 
 @router.post("/templates/{template_id}/use")
-async def record_template_usage(template_id: str):
+def record_template_usage(template_id: str):
     """
     Record template usage (increment usage_count and update last_used)
     """
     
     
-    result = await db.sale_templates.update_one(
+    result = db.sale_templates.update_one(
         {"id": template_id},
         {
             "$inc": {"usage_count": 1},
@@ -121,19 +121,19 @@ async def record_template_usage(template_id: str):
     return {"message": "Template usage recorded"}
 
 @router.get("/templates/{template_id}/products")
-async def get_template_products(template_id: str):
+def get_template_products(template_id: str):
     """
     Get all products for a template with full product details
     """
     
     
     # Get template
-    template = await db.sale_templates.find_one({"id": template_id}, {"_id": 0})
+    template = db.sale_templates.find_one({"id": template_id}, {"_id": 0})
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
     
     # Get products
-    products = await db.products.find(
+    products = db.products.find(
         {"id": {"$in": template["product_ids"]}},
         {"_id": 0}
     ).to_list(100)
