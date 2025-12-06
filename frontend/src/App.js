@@ -1482,7 +1482,6 @@ function App() {
                   📊 {getText('stockMovements')}
                 </button>
               </nav>
-            </div>
           </div>
         </div>
       </header>
