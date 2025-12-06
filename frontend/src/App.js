@@ -338,6 +338,36 @@ function App() {
     }
   };
 
+  const fetchTemplates = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/templates`);
+      setTemplates(response.data || []);
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+    }
+  };
+
+  const loadTemplate = async (templateId) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/templates/${templateId}/products`);
+      const templateProducts = response.data.products || [];
+      
+      // Add products to cart (with quantity 1)
+      templateProducts.forEach(product => {
+        addToCart(product);
+      });
+      
+      // Record template usage
+      await axios.post(`${API_URL}/api/templates/${templateId}/use`);
+      
+      showNotification(`✅ Loaded template: ${response.data.template.name}`, 'success');
+      setShowTemplates(false);
+    } catch (error) {
+      console.error('Error loading template:', error);
+      showNotification('Failed to load template', 'error');
+    }
+  };
+
   // Product search function - searches by name, SKU, or ID
   const handleProductSearch = (searchValue) => {
     setProductSearchTerm(searchValue);
