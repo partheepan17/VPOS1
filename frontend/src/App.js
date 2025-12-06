@@ -1592,6 +1592,57 @@ function App() {
                   </button>
                 </div>
               </div>
+
+              {/* Quick Sale Templates */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex justify-between items-center mb-3">
+                  <label className="block text-lg font-semibold text-gray-700">
+                    ⚡ Quick Sale Templates
+                  </label>
+                  <button
+                    onClick={() => setShowTemplates(!showTemplates)}
+                    className="text-sm text-primary-600 hover:text-primary-800 font-medium"
+                  >
+                    {showTemplates ? '▼ Hide' : '▶ Show All'}
+                  </button>
+                </div>
+                
+                {/* First 5 Templates as Quick Buttons */}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {templates.slice(0, 5).map((template, index) => (
+                    <button
+                      key={template.id}
+                      onClick={() => loadTemplate(template.id)}
+                      className="px-4 py-2 bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white rounded-lg text-sm font-medium transition shadow-md"
+                      title={`${template.product_ids.length} products`}
+                    >
+                      F{index + 5} • {template.name}
+                    </button>
+                  ))}
+                  {templates.length === 0 && (
+                    <p className="text-sm text-gray-500">No templates yet. Create one in Templates page.</p>
+                  )}
+                </div>
+                
+                {/* Dropdown with All Templates */}
+                {showTemplates && templates.length > 5 && (
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                      {templates.slice(5).map(template => (
+                        <button
+                          key={template.id}
+                          onClick={() => loadTemplate(template.id)}
+                          className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded text-sm font-medium text-left transition"
+                        >
+                          <div className="font-semibold">{template.name}</div>
+                          <div className="text-xs text-gray-600">{template.product_ids.length} products</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Product Search */}
               <div className="bg-white rounded-lg shadow-md p-6 relative">
                 <label className="block text-lg font-semibold text-gray-700 mb-3">
