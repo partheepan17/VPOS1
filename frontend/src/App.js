@@ -1409,6 +1409,16 @@ function App() {
                 
                 {/* SYSTEM & SETTINGS */}
                 <button
+                  onClick={() => setCurrentView('templates')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'templates'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                >
+                  ⚡ Templates
+                </button>
+                <button
                   onClick={() => setCurrentView('users')}
                   className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'users'
