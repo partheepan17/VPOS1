@@ -1408,46 +1408,76 @@ function App() {
                 
                 {/* SYSTEM & SETTINGS */}
                 <button
-                  onClick={() => setCurrentView('stock-entry')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
-                    currentView === 'stock-entry'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  onClick={() => setCurrentView('users')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'users'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
-                  data-testid="nav-stock-entry"
                 >
-                  📦 {getText('stockEntry')}
+                  👤 Users
                 </button>
                 <button
-                  onClick={() => setCurrentView('stock-adjustments')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
-                    currentView === 'stock-adjustments'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                  onClick={() => setCurrentView('terminals')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'terminals'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
-                  data-testid="nav-stock-adjustments"
+                  data-testid="nav-terminals"
                 >
-                  📝 {getText('stockAdjustments')}
+                  💻 {getText('terminals')}
+                </button>
+                <button
+                  onClick={() => setCurrentView('devices')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'devices'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                  data-testid="nav-devices"
+                >
+                  🖨️ Devices
+                </button>
+                <button
+                  onClick={() => setCurrentView('features')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'features'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                >
+                  🎛️ Features
+                </button>
+                <button
+                  onClick={() => setCurrentView('store-custom')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'store-custom'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                >
+                  🏪 Store
+                </button>
+                <button
+                  onClick={() => setCurrentView('settings')}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    currentView === 'settings'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                  }`}
+                  data-testid="nav-settings"
+                >
+                  ⚙️ {getText('settings')}
                 </button>
                 <button
                   onClick={() => setCurrentView('stock-movements')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                     currentView === 'stock-movements'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
+                      ? 'bg-white text-primary-700 shadow-md'
+                      : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
                   }`}
                   data-testid="nav-stock-movements"
-                >
-                  📊 {getText('stockMovements')}
-                </button>
-                <button
-                  onClick={() => setCurrentView('inventory')}
-                  className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
-                    currentView === 'inventory'
-                      ? 'bg-white text-primary-600'
-                      : 'bg-primary-700 text-white hover:bg-primary-800'
-                  }`}
-                  data-testid="nav-inventory"
                 >
                   {getText('inventory')}
                 </button>
